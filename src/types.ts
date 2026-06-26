@@ -20,6 +20,12 @@ export interface Guests{
   phone:string;
 }
 
+export interface CreateGuestBody{
+  name:string;
+  email:string;
+  phone:string;
+}
+
 type BookingStatus = "confirmed" | "cancelled" | "pending";
 export interface Booking{
   id:number;
