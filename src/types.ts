@@ -37,6 +37,14 @@ export interface Booking{
   status:BookingStatus
 }
 
+export interface CreateBookingBody{
+  guest_id:number;
+  room_id:number;
+  check_in:string;
+  check_out:string;
+  price:number;
+  status:BookingStatus
+}
 export interface ApiResponse<T>{
   success:boolean;
   message:string;
