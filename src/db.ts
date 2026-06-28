@@ -1,8 +1,5 @@
-import dotenv from 'dotenv'
-import { error } from 'node:console';
 import { Pool } from 'pg';
 
-dotenv.config();
 
 const pool = new Pool({
   host:process.env.DB_HOST,

@@ -19,18 +19,13 @@ router.get("/", async(req:Request,res:Response<ApiResponse<Rooms[] | null>>)=>{
 });
 
 router.get("/available", async(req:Request,res:Response<ApiResponse<Rooms[] | null>>)=>{
-  const availableParams  = req.query.available as string;
-  if(availableParams === undefined){
-    return res.status(404).json({success:false,message:"Query params 'available' is required! ",data:null});
-  }
-  const sql = "SELECT * FROM rooms WHERE is_available = $1;";
-  const available = availableParams.toLowerCase();
+  const sql = "SELECT * FROM rooms WHERE is_available = true;";
   try {
-    const result = await pool.query<Rooms>(sql,[available]);
+    const result = await pool.query<Rooms>(sql);
     if(result.rows.length === 0 ){
       return res.status(404).json({success:false,message:"No rooms available!",data:null});
     }
-    return res.status(200).json({success:true,message:"Rooms available!",data:result.rows});
+    return res.status(200).json({success:true,message:"Rooms available fetched!",data:result.rows});
   } catch (error) {
     console.log("DATABASE_ERROR: ",error);
     return res.status(500).json({success:false,message:"Internal server error!",data:null})

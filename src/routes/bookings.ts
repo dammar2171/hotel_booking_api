@@ -1,7 +1,6 @@
 import pool from "../db";
 import { Router,Request,Response } from "express";
 import { Booking,ApiResponse,CreateBookingBody, Rooms } from "../types";
-import { json } from "node:stream/consumers";
 
 const router = Router();
 
@@ -35,7 +34,7 @@ router.get("/:id", async(req:Request<{id:string}>,res:Response<ApiResponse<Booki
 })
 
 router.post("/", async(req:Request<{},{},CreateBookingBody>,res:Response<ApiResponse<Booking | null>>)=>{
-  const {guest_id,room_id,check_in,check_out,status}=req.body;
+  const {guest_id,room_id,check_in,check_out}=req.body;
   const sql = "INSERT INTO bookings (guest_id,room_id,check_in,check_out,total_price,status)VALUES($1,$2,$3,$4,$5,$6) RETURNING *;";
   const check_room_sql = "SELECT * FROM rooms WHERE id=$1;";
   const update_room_sql = "UPDATE rooms SET is_available= $1 WHERE id =$2;";
@@ -63,7 +62,7 @@ router.post("/", async(req:Request<{},{},CreateBookingBody>,res:Response<ApiResp
 
     const roomPrice = room_detail.rows[0].price;
     const total_price = roomPrice * total_day;
-    const result =  await pool.query<Booking>(sql,[guest_id,room_id,check_in,check_out,total_price,status]);
+    const result =  await pool.query<Booking>(sql,[guest_id,room_id,check_in,check_out,total_price,"confirmed"]);
     if(result.rowCount === 0){
       return res.status(500).json({success:false,message:"Insertion problem!",data:null})
     }else{
@@ -85,14 +84,17 @@ router.put("/:id/cancel", async (req:Request<{id:string}>,res:Response<ApiRespon
   const update_room_available_sql = "UPDATE rooms SET is_available =$1 WHERE id=$2 ;";
   try {
     const booking_detail = await pool.query(booking_detail_sql,[id]);
+    if(booking_detail.rowCount === 0 ){
+      return res.status(404).json({success:false,message:"Booking not found!",data:null});
+    }
     if(booking_detail.rows[0].status === "cancelled"){
       return res.status(400).json({success:false,message:"Already cancelled room!",data:null});
     }
     const result = await pool.query<Booking>(sql,["cancelled",id]);
-    const room_id = result.rows[0].room_id;
     if(result.rowCount === 0){
       return res.status(400).json({success:false,message:"Updation problem!",data:null});
     }
+    const room_id = result.rows[0].room_id;
     await pool.query(update_room_available_sql,[true,room_id]);
     return res.status(200).json({success:true,message:"Booking cancelled!",data:result.rows[0]})
   } catch (error) {
@@ -101,7 +103,7 @@ router.put("/:id/cancel", async (req:Request<{id:string}>,res:Response<ApiRespon
   }
 })
 
-router.get("/guest/:guestId", async(req:Request<{guestId:string}>,res:Response<ApiResponse<Booking | null>>)=>{
+router.get("/guest/:guestId", async(req:Request<{guestId:string}>,res:Response<ApiResponse<Booking[] | null>>)=>{
   const guestId = Number(req.params.guestId);
   const sql = "SELECT * FROM bookings WHERE guest_id=$1;";
   try {
@@ -109,7 +111,7 @@ router.get("/guest/:guestId", async(req:Request<{guestId:string}>,res:Response<A
     if(result.rowCount === 0){
       return res.status(404).json({success:false,message:"No guest found with booking!",data:null});
     }
-    return res.status(200).json({success:true,message:"Guest found with booking!",data:result.rows[0]});
+    return res.status(200).json({success:true,message:"Guest found with booking!",data:result.rows});
   } catch (error) {
     console.log("DATABASE_ERROR: ",error);
     return res.status(500).json({success:false,message:"Internal server problem",data:null})

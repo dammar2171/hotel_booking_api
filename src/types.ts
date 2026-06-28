@@ -26,14 +26,14 @@ export interface CreateGuestBody{
   phone:string;
 }
 
-type BookingStatus = "confirmed" | "cancelled" | "pending";
+export type BookingStatus = "confirmed" | "cancelled" | "pending";
 export interface Booking{
   id:number;
   guest_id:number;
   room_id:number;
   check_in:string;
   check_out:string;
-  price:number;
+  total_price:number;
   status:BookingStatus
 }
 
@@ -49,4 +49,30 @@ export interface ApiResponse<T>{
   success:boolean;
   message:string;
   data:T;
+}
+export type UserRole = "user" | "admin";
+export interface User{
+  id:number;
+  name:string;
+  email:string;
+  password:string;
+  role:UserRole;
+  crested_at:string;
+}
+
+export interface RegisterBody{
+  name:string;
+  email:string;
+  password:string;
+}
+
+export interface LoginBody{
+  email:string;
+  password:string;
+}
+
+export interface JwtPayload{
+  userId:number;
+  email:string;
+  role:UserRole;
 }
