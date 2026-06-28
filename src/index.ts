@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import roomsRoutes from './routes/rooms';
 import guestsRoutes from './routes/guests';
 import bookingsRoutes from './routes/bookings';
+import authRotes from './routes/auths',
 const app = express();
 app.use(express.json());
 dotenv.config();
@@ -13,6 +14,7 @@ app.get("/",(req:Request,res:Response)=>{
   res.send("Server is running successfully!")
 })
 
+app.use("/auth",authRotes);
 app.use("/rooms",roomsRoutes);
 app.use("/guests",guestsRoutes);
 app.use("/bookings",bookingsRoutes);
