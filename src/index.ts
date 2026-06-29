@@ -2,11 +2,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express, {Request,Response} from 'express';
-import roomsRoutes from './routes/rooms';
-import guestsRoutes from './routes/guests';
-import bookingsRoutes from './routes/bookings';
-import authRoutes from './routes/auths'
-import pool from './db'
+import roomsRoutes from './routes/rooms.route';
+import guestsRoutes from './routes/guests.route';
+import bookingsRoutes from './routes/bookings.route';
+import authRoutes from './routes/auth.route';
+import pool from './db';
 
 const app = express();
 app.use(express.json());

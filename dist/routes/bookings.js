@@ -5,8 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const db_1 = __importDefault(require("../db"));
 const express_1 = require("express");
+const auths_1 = require("../middleware/auths");
 const router = (0, express_1.Router)();
-router.get("/", async (req, res) => {
+router.get("/", auths_1.authenticate, async (req, res) => {
     const sql = "SELECT * FROM bookings;";
     try {
         const result = await db_1.default.query(sql);
@@ -20,7 +21,7 @@ router.get("/", async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server problem", data: null });
     }
 });
-router.get("/:id", async (req, res) => {
+router.get("/:id", auths_1.authenticate, async (req, res) => {
     const id = Number(req.params.id);
     const sql = "SELECT * FROM bookings WHERE id = $1;";
     try {
@@ -35,7 +36,7 @@ router.get("/:id", async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server problem", data: null });
     }
 });
-router.post("/", async (req, res) => {
+router.post("/", auths_1.authenticate, async (req, res) => {
     const { guest_id, room_id, check_in, check_out } = req.body;
     const sql = "INSERT INTO bookings (guest_id,room_id,check_in,check_out,total_price,status)VALUES($1,$2,$3,$4,$5,$6) RETURNING *;";
     const check_room_sql = "SELECT * FROM rooms WHERE id=$1;";
@@ -79,7 +80,7 @@ router.post("/", async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server problem", data: null });
     }
 });
-router.put("/:id/cancel", async (req, res) => {
+router.put("/:id/cancel", auths_1.authenticate, async (req, res) => {
     const id = Number(req.params.id);
     const booking_detail_sql = "SELECT * FROM bookings WHERE id=$1;";
     const sql = "UPDATE bookings SET status = $1 WHERE id=$2 RETURNING *;";
@@ -105,7 +106,7 @@ router.put("/:id/cancel", async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server problem", data: null });
     }
 });
-router.get("/guest/:guestId", async (req, res) => {
+router.get("/guest/:guestId", auths_1.authenticate, async (req, res) => {
     const guestId = Number(req.params.guestId);
     const sql = "SELECT * FROM bookings WHERE guest_id=$1;";
     try {

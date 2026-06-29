@@ -14,7 +14,7 @@ router.post("/register", async (req, res) => {
     if (!name || !email || !password) {
         return res.status(400).json({ success: false, message: "All fields are required!", data: null });
     }
-    const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING *;";
+    const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING id,name,email,role,created_at;";
     try {
         const existing_email = await db_1.default.query("SELECT * FROM users WHERE email = $1", [email]);
         if (existing_email.rowCount && existing_email.rowCount > 0) {
@@ -35,8 +35,8 @@ router.post("/register", async (req, res) => {
         }
         return res.status(201).json({
             success: true,
-            message: "User regestered successfully!",
-            data: result.rows
+            message: "User registered successfully!",
+            data: result.rows[0]
         });
     }
     catch (error) {
@@ -71,7 +71,7 @@ router.post("/login", async (req, res) => {
         if (!compare_password) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid email or password!",
+                message: "Invalid email or password!2",
                 data: null
             });
         }
