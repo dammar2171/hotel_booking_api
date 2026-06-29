@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, message: "Guest not found!", data: null });
         }
-        return res.status(200).json({ success: true, message: "Guests fetched sucessfully!", data: result.rows });
+        return res.status(200).json({ success: true, message: "Guests fetched successfully!", data: result.rows });
     }
     catch (error) {
         console.log("DATABASE_ERROR: ", error);
@@ -28,7 +28,7 @@ router.get("/:id", async (req, res) => {
         if (result.rowCount === 0) {
             return res.status(404).json({ success: false, message: "Guest not found!", data: null });
         }
-        return res.status(200).json({ success: true, message: "Guests found sucessfully!", data: result.rows[0] });
+        return res.status(200).json({ success: true, message: "Guests found successfully!", data: result.rows[0] });
     }
     catch (error) {
         console.log("DATABASE_ERROR: ", error);
@@ -43,7 +43,7 @@ router.post("/", async (req, res) => {
         if (result.rowCount === 0) {
             return res.status(500).json({ success: false, message: "Insertion problem!", data: null });
         }
-        return res.status(201).json({ success: true, message: "Guests inserted sucessfully!", data: result.rows[0] });
+        return res.status(201).json({ success: true, message: "Guests inserted successfully!", data: result.rows[0] });
     }
     catch (error) {
         console.log("DATABASE_ERROR: ", error);
@@ -57,9 +57,9 @@ router.put("/:id", async (req, res) => {
     try {
         const result = await db_1.default.query(sql, [name, email, phone, id]);
         if (result.rowCount === 0) {
-            return res.status(500).json({ success: false, message: "Updation problem!", data: null });
+            return res.status(404).json({ success: false, message: "Guest not found!", data: null });
         }
-        return res.status(200).json({ success: true, message: "Guest updated succesfully!", data: result.rows[0] });
+        return res.status(200).json({ success: true, message: "Guest updated successfully!", data: result.rows[0] });
     }
     catch (error) {
         console.log("DATABASE_ERROR: ", error);
@@ -69,7 +69,12 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
     const id = Number(req.params.id);
     const sql = "DELETE FROM guests WHERE id=$1 RETURNING *;";
+    const find_booking_sql = "SELECT * FROM bookings WHERE guest_id =$1;";
     try {
+        const booking_detail = await db_1.default.query(find_booking_sql, [id]);
+        if ((booking_detail.rowCount ?? 0) > 0) {
+            return res.status(400).json({ success: false, message: "Cannot delete guest with existing bookings", data: null });
+        }
         const result = await db_1.default.query(sql, [id]);
         if (result.rowCount === 0) {
             return res.status(500).json({ success: false, message: "Deletion problem!", data: null });

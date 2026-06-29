@@ -21,18 +21,13 @@ router.get("/", async (req, res) => {
     }
 });
 router.get("/available", async (req, res) => {
-    const availableParams = req.query.available;
-    if (availableParams === undefined) {
-        return res.status(404).json({ success: false, message: "Query params 'available' is required! ", data: null });
-    }
-    const sql = "SELECT * FROM rooms WHERE is_available = $1;";
-    const available = availableParams.toLowerCase();
+    const sql = "SELECT * FROM rooms WHERE is_available = true;";
     try {
-        const result = await db_1.default.query(sql, [available]);
+        const result = await db_1.default.query(sql);
         if (result.rows.length === 0) {
             return res.status(404).json({ success: false, message: "No rooms available!", data: null });
         }
-        return res.status(200).json({ success: true, message: "Rooms available!", data: result.rows });
+        return res.status(200).json({ success: true, message: "Rooms available fetched!", data: result.rows });
     }
     catch (error) {
         console.log("DATABASE_ERROR: ", error);
