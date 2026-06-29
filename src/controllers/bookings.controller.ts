@@ -53,10 +53,10 @@ export const createBooking = async(req:Request<{},{},CreateBookingBody>,res:Resp
     const check_in_date = new Date(check_in);
     const check_out_date = new Date(check_out);
     const oneDay = 1000 * 60 * 60 * 24;
-    if(check_in_date >= check_out_date){
-      await client.query("ROLLBACK");
-      return res.status(400).json({success:false,message:"Check-in date must be before check-out date!",data:null})
-    }
+    // if(check_in_date >= check_out_date){
+    //   await client.query("ROLLBACK");
+    //   return res.status(400).json({success:false,message:"Check-in date must be before check-out date!",data:null})
+    // }
     const diffInTime = check_out_date.getTime()-check_in_date.getTime(); 
     const total_day = Math.round(diffInTime/oneDay);
 

@@ -2,10 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const guests_controller_1 = require("../controllers/guests.controller");
+const validate_1 = require("../middleware/validate");
+const guests_schema_1 = require("../schemas/guests.schema");
 const router = (0, express_1.Router)();
 router.get("/", guests_controller_1.getGuests);
 router.get("/:id", guests_controller_1.getGuestById);
-router.post("/", guests_controller_1.createGuestSchema);
-router.put("/:id", guests_controller_1.updateGuestSchema);
+router.post("/", (0, validate_1.validate)(guests_schema_1.createGuestSchema), guests_controller_1.createGuest);
+router.put("/:id", (0, validate_1.validate)(guests_schema_1.updateGuestSchema), guests_controller_1.updateGuest);
 router.delete("/:id", guests_controller_1.deleteGuest);
 exports.default = router;

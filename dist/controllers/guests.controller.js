@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteGuest = exports.updateGuestSchema = exports.createGuestSchema = exports.getGuestById = exports.getGuests = void 0;
+exports.deleteGuest = exports.updateGuest = exports.createGuest = exports.getGuestById = exports.getGuests = void 0;
 const db_1 = __importDefault(require("../db"));
 const getGuests = async (req, res) => {
     const sql = "SELECT * FROM guests;";
@@ -36,7 +36,7 @@ const getGuestById = async (req, res) => {
     }
 };
 exports.getGuestById = getGuestById;
-const createGuestSchema = async (req, res) => {
+const createGuest = async (req, res) => {
     const { name, email, phone } = req.body;
     const sql = "INSERT INTO guests(name,email,phone) VALUES($1,$2,$3) RETURNING *;";
     try {
@@ -51,8 +51,8 @@ const createGuestSchema = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error!", data: null });
     }
 };
-exports.createGuestSchema = createGuestSchema;
-const updateGuestSchema = async (req, res) => {
+exports.createGuest = createGuest;
+const updateGuest = async (req, res) => {
     const { name, email, phone } = req.body;
     const id = Number(req.params.id);
     const sql = "UPDATE guests SET name=COALESCE($1,name),email=COALESCE($2,email),phone=COALESCE($3,phone) WHERE id=$4 RETURNING *;";
@@ -68,7 +68,7 @@ const updateGuestSchema = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error!", data: null });
     }
 };
-exports.updateGuestSchema = updateGuestSchema;
+exports.updateGuest = updateGuest;
 const deleteGuest = async (req, res) => {
     const id = Number(req.params.id);
     const sql = "DELETE FROM guests WHERE id=$1 RETURNING *;";

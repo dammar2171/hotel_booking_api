@@ -8,11 +8,12 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authenticate = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer')) {
-        return res.status(401).json({
+        res.status(401).json({
             success: false,
             message: "Access denied. No token provided!",
             data: null
         });
+        return;
     }
     const token = authHeader.split(" ")[1];
     try {
@@ -21,7 +22,7 @@ const authenticate = (req, res, next) => {
         next();
     }
     catch (error) {
-        return res.status(401).json({
+        res.status(401).json({
             success: false,
             message: "Expired or invalid token",
             data: null
@@ -31,11 +32,12 @@ const authenticate = (req, res, next) => {
 exports.authenticate = authenticate;
 const authorizeAdmin = (req, res, next) => {
     if (req.user?.role !== "admin") {
-        return res.status(403).json({
+        res.status(403).json({
             success: false,
             message: "Access denied. Admin only!",
             data: null
         });
+        return;
     }
     next();
 };
