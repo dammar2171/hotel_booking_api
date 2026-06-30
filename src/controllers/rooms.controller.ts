@@ -1,20 +1,49 @@
 import pool from "../db";
 import { Request,Response } from "express";
-import { ApiResponse, CreateRoomsBody, Rooms } from "../types/types";
+import { ApiResponse, CreateRoomsBody, PaginatedResponse, PaginationQuery, Rooms } from "../types/types";
+import { buildPaginationMeta, getPagination } from "../utils/pagination";
 
-export const getRooms= async(req:Request,res:Response<ApiResponse<Rooms[] | null>>)=>{
-  const sql = "SELECT * FROM rooms;";
+export const getRooms = async (
+  req: Request<{}, {}, {}, PaginationQuery & { type?: string }>,
+  res: Response<PaginatedResponse<Rooms>>
+) => {
+  const { currentPage, pageLimit, offset } = getPagination(req.query.page, req.query.limit);
+  const type = req.query.type;
+
   try {
-    const result = await pool.query<Rooms>(sql);
-    if(result.rows.length === 0 ){
-      return res.status(404).json({success:false,message:"No rooms found!",data:null});
+    let countSql = "SELECT COUNT(*) as total FROM rooms";
+    let dataSql  = "SELECT * FROM rooms";
+    const params: any[] = [];
+
+    if (type) {
+      countSql += " WHERE type ILIKE $1";
+      dataSql  += " WHERE type ILIKE $1";
+      params.push(type);
     }
-    return res.status(200).json({success:true,message:"Rooms found!",data:result.rows});
+
+    dataSql += ` ORDER BY id LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+
+    const totalCount = await pool.query(countSql, type ? [type] : []);
+    const totalItems = Number(totalCount.rows[0].total);
+
+    const result = await pool.query<Rooms>(dataSql, [...params, pageLimit, offset]);
+
+    return res.status(200).json({
+      success: true,
+      message: result.rows.length === 0 ? "No rooms found" : "Rooms fetched successfully!",
+      data: result.rows,
+      pagination: buildPaginationMeta(currentPage, pageLimit, totalItems),
+    });
   } catch (error) {
-    console.log("DATABASE_ERROR: ",error);
-    return res.status(500).json({success:false,message:"Internal server error!",data:null})
+    console.log("DATABASE_ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error!",
+      data: [],
+      pagination: buildPaginationMeta(1, 10, 0),
+    });
   }
-}
+};
 
 export const getAvailableRooms=async(req:Request,res:Response<ApiResponse<Rooms[] | null>>)=>{
   const sql = "SELECT * FROM rooms WHERE is_available = true;";

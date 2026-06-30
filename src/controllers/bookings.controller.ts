@@ -1,19 +1,30 @@
 import pool from "../db";
 import { Request,Response } from "express";
-import { Booking,ApiResponse,CreateBookingBody, Rooms } from "../types/types";
+import { Booking,ApiResponse,CreateBookingBody, Rooms, PaginatedResponse, PaginationQuery } from "../types/types";
+import { buildPaginationMeta, getPagination } from "../utils/pagination";
 
 
-export const getBookings = async(req:Request,res:Response<ApiResponse<Booking[] | null>>)=>{
-  const sql = "SELECT * FROM bookings;";
+export const getBookings = async(req:Request<{},{},{},PaginationQuery>,res:Response<PaginatedResponse<Booking>>)=>{
+  const {currentPage,pageLimit,offset} = getPagination(req.query.page,req.query.limit);
   try {
-    const result = await pool.query<Booking>(sql);
-    if(result.rows.length === 0){
-      return res.status(404).json({success:false,message:"No booking found!",data:null});
-    }
-    return res.status(200).json({success:true,message:"Booking fetched successfully",data:result.rows})
+    const totalCount = await pool.query(" SELECT COUNT(*) as total FROM bookings");
+    const totalItem = Number(totalCount.rows[0].total);
+    const sql = "SELECT * FROM bookings ORDER BY id limit $1 OFFSET $2;";
+    const result = await pool.query<Booking>(sql,[pageLimit,offset]);
+    return res.status(200).json({
+      success:true,
+      message:result.rows ? "No booking found!":"Booking fetched successfully!",
+      data:result.rows,
+      pagination:buildPaginationMeta(currentPage,pageLimit,totalItem)
+    })
   } catch (error) {
     console.log("DATABASE_ERROR: ",error);
-    return res.status(500).json({success:false,message:"Internal server problem",data:null})
+    return res.status(500).json({
+      success:false,
+      message:"Internal server problem",
+      data:[],
+      pagination: buildPaginationMeta(1,10,0)
+    })
   }
 }
 
@@ -79,7 +90,7 @@ export const createBooking = async(req:Request<{},{},CreateBookingBody>,res:Resp
   }
 }
 
-export const updateBooking = async (req:Request<{id:string}>,res:Response<ApiResponse<Booking | null>>)=>{
+export const cancelBooking = async (req:Request<{id:string}>,res:Response<ApiResponse<Booking | null>>)=>{
   const id = Number(req.params.id);
   const booking_detail_sql = "SELECT * FROM bookings WHERE id=$1;";
   const sql = "UPDATE bookings SET status = $1 WHERE id=$2 RETURNING *;";

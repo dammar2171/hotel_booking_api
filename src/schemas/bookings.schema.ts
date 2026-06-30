@@ -17,8 +17,6 @@ export const createBookingSchema = z
       .refine((val) => !isNaN(Date.parse(val)), {
         message: "check_out must be a valid date",
       }),
-
-    status: z.enum(["confirmed", "pending", "cancelled"]),
   })
   .refine(
     (data) => new Date(data.check_out) > new Date(data.check_in),

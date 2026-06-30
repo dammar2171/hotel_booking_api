@@ -1,18 +1,29 @@
 import { Request, Response } from "express";
 import pool from "../db";
-import { Guests, ApiResponse, CreateGuestBody, Booking } from "../types/types";
+import { Guests, ApiResponse, CreateGuestBody, Booking, PaginationQuery, PaginatedResponse } from "../types/types";
+import { buildPaginationMeta, getPagination } from "../utils/pagination";
 
-export const getGuests = async (req: Request, res: Response<ApiResponse<Guests[] | null>>) => {
-  const sql = "SELECT * FROM guests;";
+export const getGuests = async (req: Request<{},{},{},PaginationQuery>, res: Response<PaginatedResponse<Guests>>) => {
+  const {currentPage,pageLimit,offset}=getPagination(req.query.page,req.query.limit);
   try {
-    const result = await pool.query<Guests>(sql);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ success: false, message: "Guest not found!", data: null });
-    }
-    return res.status(200).json({ success: true, message: "Guests fetched successfully!", data: result.rows });
+    const totalGuests = await pool.query("SELECT COUNT(*) as total FROM guests");
+    const totalItem = Number(totalGuests.rows[0].total);
+    const sql = "SELECT * FROM guests ORDER BY id LIMIT $1 OFFSET $2;";
+    const result = await pool.query<Guests>(sql,[pageLimit,offset]);
+    return res.status(200).json({ 
+      success: true, 
+      message: result.rows.length === 0 ? "Guests not found!" : "Guests fetched successfully!", 
+      data: result.rows,
+      pagination:buildPaginationMeta(currentPage,pageLimit,totalItem), 
+    });
   } catch (error) {
     console.log("DATABASE_ERROR: ", error);
-    return res.status(500).json({ success: false, message: "Internal server error!", data: null });
+    return res.status(500).json({ 
+      success: false, message: 
+      "Internal server error!", 
+      data: [],
+      pagination: buildPaginationMeta(1,10,0) 
+    });
   }
 };
 

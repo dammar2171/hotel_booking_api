@@ -8,5 +8,5 @@ export const registerUserSchema = z.object({
 
 export const loginUserSchema = z.object({
   email:z.email("Email invalid format!"),
-  password:z.string().min(6,"Password is required!")
+  password:z.string().min(1,"Password is required!")
 })

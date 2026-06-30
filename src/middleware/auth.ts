@@ -1,6 +1,6 @@
 import { Request,Response,NextFunction } from "express";
 import jwt from 'jsonwebtoken';
-import { JwtPayload ,ApiResponse, User} from "../types/types";
+import { JwtPayload } from "../types/types";
 
 declare global{
   namespace Express{
@@ -10,7 +10,7 @@ declare global{
   }
 }
 
-export const authenticate=(req:Request,res:Response,next:NextFunction):void =>{
+export const authenticate=(req:Request<any,any,any,any>,res:Response,next:NextFunction):void =>{
   const authHeader = req.headers.authorization;
   if(!authHeader || !authHeader.startsWith('Bearer')){
     res.status(401).json({
@@ -34,7 +34,7 @@ export const authenticate=(req:Request,res:Response,next:NextFunction):void =>{
   }
 }
 
-export const authorizeAdmin = (req:Request,res:Response,next:NextFunction):void=>{
+export const authorizeAdmin = (req:Request<any,any,any,any>,res:Response,next:NextFunction):void=>{
   if(req.user?.role !== "admin"){
     res.status(403).json({
       success:false,

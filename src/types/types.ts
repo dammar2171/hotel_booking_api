@@ -76,3 +76,32 @@ export interface JwtPayload{
   email:string;
   role:UserRole;
 }
+
+export interface PaginationQuery{
+  page:string,
+  limit:string
+}
+
+export interface PaginatedResponse<T>{
+  success:boolean;
+  message:string;
+  data:T[];
+  pagination:{
+    currentPage:number;
+    totalPage:number;
+    totalItem:number;
+    limit:number;
+  }
+}
+
+export interface Stats{
+  totalRooms:number;
+  availableRooms:number;
+  occupiedRooms:number;
+  totalGuests:number;
+  totalBookings:number
+  confirmedBooking:number;
+  cancelledBooking:number;
+  totalRevenue:number;
+  occupancyRate:number;
+}

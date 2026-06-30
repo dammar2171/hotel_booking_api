@@ -9,5 +9,5 @@ exports.registerUserSchema = zod_1.z.object({
 });
 exports.loginUserSchema = zod_1.z.object({
     email: zod_1.z.email("Email invalid format!"),
-    password: zod_1.z.string().min(6, "Password is required!")
+    password: zod_1.z.string().min(1, "Password is required!")
 });

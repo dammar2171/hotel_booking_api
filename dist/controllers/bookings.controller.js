@@ -3,20 +3,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getBookingByGuestId = exports.updateBooking = exports.createBooking = exports.getBookingById = exports.getBookings = void 0;
+exports.getBookingByGuestId = exports.cancelBooking = exports.createBooking = exports.getBookingById = exports.getBookings = void 0;
 const db_1 = __importDefault(require("../db"));
+const pagination_1 = require("../utils/pagination");
 const getBookings = async (req, res) => {
-    const sql = "SELECT * FROM bookings;";
+    const { currentPage, pageLimit, offset } = (0, pagination_1.getPagination)(req.query.page, req.query.limit);
     try {
-        const result = await db_1.default.query(sql);
-        if (result.rows.length === 0) {
-            return res.status(404).json({ success: false, message: "No booking found!", data: null });
-        }
-        return res.status(200).json({ success: true, message: "Booking fetched successfully", data: result.rows });
+        const totalCount = await db_1.default.query(" SELECT COUNT(*) as total FROM bookings");
+        const totalItem = Number(totalCount.rows[0].total);
+        const sql = "SELECT * FROM bookings ORDER BY id limit $1 OFFSET $2;";
+        const result = await db_1.default.query(sql, [pageLimit, offset]);
+        return res.status(200).json({
+            success: true,
+            message: result.rows ? "No booking found!" : "Booking fetched successfully!",
+            data: result.rows,
+            pagination: (0, pagination_1.buildPaginationMeta)(currentPage, pageLimit, totalItem)
+        });
     }
     catch (error) {
         console.log("DATABASE_ERROR: ", error);
-        return res.status(500).json({ success: false, message: "Internal server problem", data: null });
+        return res.status(500).json({
+            success: false,
+            message: "Internal server problem",
+            data: [],
+            pagination: (0, pagination_1.buildPaginationMeta)(1, 10, 0)
+        });
     }
 };
 exports.getBookings = getBookings;
@@ -57,10 +68,10 @@ const createBooking = async (req, res) => {
         const check_in_date = new Date(check_in);
         const check_out_date = new Date(check_out);
         const oneDay = 1000 * 60 * 60 * 24;
-        if (check_in_date >= check_out_date) {
-            await client.query("ROLLBACK");
-            return res.status(400).json({ success: false, message: "Check-in date must be before check-out date!", data: null });
-        }
+        // if(check_in_date >= check_out_date){
+        //   await client.query("ROLLBACK");
+        //   return res.status(400).json({success:false,message:"Check-in date must be before check-out date!",data:null})
+        // }
         const diffInTime = check_out_date.getTime() - check_in_date.getTime();
         const total_day = Math.round(diffInTime / oneDay);
         const roomPrice = room_detail.rows[0].price;
@@ -84,7 +95,7 @@ const createBooking = async (req, res) => {
     }
 };
 exports.createBooking = createBooking;
-const updateBooking = async (req, res) => {
+const cancelBooking = async (req, res) => {
     const id = Number(req.params.id);
     const booking_detail_sql = "SELECT * FROM bookings WHERE id=$1;";
     const sql = "UPDATE bookings SET status = $1 WHERE id=$2 RETURNING *;";
@@ -119,7 +130,7 @@ const updateBooking = async (req, res) => {
         client.release();
     }
 };
-exports.updateBooking = updateBooking;
+exports.cancelBooking = cancelBooking;
 const getBookingByGuestId = async (req, res) => {
     const guestId = Number(req.params.guestId);
     const sql = "SELECT * FROM bookings WHERE guest_id=$1;";

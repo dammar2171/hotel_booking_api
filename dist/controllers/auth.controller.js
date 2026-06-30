@@ -10,9 +10,9 @@ const db_1 = __importDefault(require("../db"));
 const SALT_ROUNDS = 10;
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
-    if (!name || !email || !password) {
-        return res.status(400).json({ success: false, message: "All fields are required!", data: null });
-    }
+    // if(!name || !email || !password){
+    //   return res.status(400).json({success:false,message:"All fields are required!",data:null});
+    // }
     const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING id,name,email,role,created_at;";
     try {
         const existing_email = await db_1.default.query("SELECT * FROM users WHERE email = $1", [email]);
@@ -50,13 +50,13 @@ const registerUser = async (req, res) => {
 exports.registerUser = registerUser;
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
-    if (!email || !password) {
-        return res.status(400).json({
-            success: false,
-            message: "All field required!",
-            data: null
-        });
-    }
+    // if(!email || !password){
+    //   return res.status(400).json({
+    //     success:false,
+    //     message:"All field required!",
+    //     data:null
+    //   });
+    // }
     try {
         const result = await db_1.default.query("SELECT * FROM users WHERE email=$1", [email]);
         if (result.rowCount === 0) {

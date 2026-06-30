@@ -6,7 +6,7 @@ import { createRoomSchema, updateRoomSchema } from "../schemas/rooms.schema";
 
 const router=Router();
 
-router.get("/",getRooms);
+router.get("/",authenticate,getRooms);
 router.get("/available",getAvailableRooms);
 router.get("/:id",getRoomById);
 router.post("/",authenticate,authorizeAdmin, validate(createRoomSchema),createRoom);

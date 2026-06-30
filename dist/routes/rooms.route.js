@@ -6,7 +6,7 @@ const auth_1 = require("../middleware/auth");
 const validate_1 = require("../middleware/validate");
 const rooms_schema_1 = require("../schemas/rooms.schema");
 const router = (0, express_1.Router)();
-router.get("/", rooms_controller_1.getRooms);
+router.get("/", auth_1.authenticate, rooms_controller_1.getRooms);
 router.get("/available", rooms_controller_1.getAvailableRooms);
 router.get("/:id", rooms_controller_1.getRoomById);
 router.post("/", auth_1.authenticate, auth_1.authorizeAdmin, (0, validate_1.validate)(rooms_schema_1.createRoomSchema), rooms_controller_1.createRoom);

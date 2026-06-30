@@ -9,6 +9,6 @@ const router = (0, express_1.Router)();
 router.get("/", auth_1.authenticate, bookings_controller_1.getBookings);
 router.get("/:id", auth_1.authenticate, bookings_controller_1.getBookingById);
 router.post("/", auth_1.authenticate, (0, validate_1.validate)(bookings_schema_1.createBookingSchema), bookings_controller_1.createBooking);
-router.put("/:id/cancel", auth_1.authenticate, bookings_controller_1.updateBooking);
+router.put("/:id/cancel", auth_1.authenticate, bookings_controller_1.cancelBooking);
 router.get("/guest/:guestId", auth_1.authenticate, bookings_controller_1.getBookingByGuestId);
 exports.default = router;
