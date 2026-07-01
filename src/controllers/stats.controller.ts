@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { ApiResponse, Stats } from "../types/types";
-import pool from "../db";
+import pool from "../config/db";
 
 export const getStats = async (
   req: Request,

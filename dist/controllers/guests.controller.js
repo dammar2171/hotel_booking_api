@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteGuest = exports.updateGuest = exports.createGuest = exports.getGuestById = exports.getGuests = void 0;
-const db_1 = __importDefault(require("../db"));
+const db_1 = __importDefault(require("../config/db"));
 const pagination_1 = require("../utils/pagination");
 const AppError_1 = require("../utils/AppError");
 const getGuests = async (req, res, next) => {
@@ -22,12 +22,7 @@ const getGuests = async (req, res, next) => {
         });
     }
     catch (error) {
-        console.log("DATABASE_ERROR: ", error);
-        return res.status(500).json({
-            success: false, message: "Internal server error!",
-            data: [],
-            pagination: (0, pagination_1.buildPaginationMeta)(1, 10, 0)
-        });
+        next(error);
     }
 };
 exports.getGuests = getGuests;
@@ -51,9 +46,6 @@ const createGuest = async (req, res, next) => {
     const sql = "INSERT INTO guests(name,email,phone) VALUES($1,$2,$3) RETURNING *;";
     try {
         const result = await db_1.default.query(sql, [name, email, phone]);
-        if (result.rowCount === 0) {
-            throw new AppError_1.AppError("Insertion problem!", 500);
-        }
         return res.status(201).json({ success: true, message: "Guest inserted successfully!", data: result.rows[0] });
     }
     catch (error) {

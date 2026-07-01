@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import pool from "../db";
+import pool from "../config/db";
 import { Guests, ApiResponse, CreateGuestBody, Booking, PaginationQuery, PaginatedResponse } from "../types/types";
 import { buildPaginationMeta, getPagination } from "../utils/pagination";
 import { AppError } from "../utils/AppError";
@@ -41,9 +41,6 @@ export const createGuest = async (req: Request<{}, {}, CreateGuestBody>, res: Re
   const sql = "INSERT INTO guests(name,email,phone) VALUES($1,$2,$3) RETURNING *;";
   try {
     const result = await pool.query<Guests>(sql, [name, email, phone]);
-    if (result.rowCount === 0) {
-      throw new AppError("Insertion problem!",500);
-    }
     return res.status(201).json({ success: true, message: "Guest inserted successfully!", data: result.rows[0] });
   } catch (error) {
     next(error)

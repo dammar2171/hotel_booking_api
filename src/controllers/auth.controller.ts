@@ -1,7 +1,7 @@
 import { NextFunction, Request,Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
-import pool from '../db'
+import pool from '../config/db'
 import { User,RegisterBody,LoginBody,JwtPayload,ApiResponse } from '../types/types';
 import { AppError } from '../utils/AppError';
 
@@ -10,9 +10,6 @@ const SALT_ROUNDS = 10;
 
 export const registerUser=async(req:Request<{},{},RegisterBody>,res:Response<ApiResponse<Omit<User,"password"> | null>>,next:NextFunction)=>{
   const {name,email,password}=req.body;
-  // if(!name || !email || !password){
-  //   return res.status(400).json({success:false,message:"All fields are required!",data:null});
-  // }
   const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING id,name,email,role,created_at;";
   try {
     const existing_email = await pool.query<User>("SELECT * FROM users WHERE email = $1",[email]);
@@ -21,9 +18,6 @@ export const registerUser=async(req:Request<{},{},RegisterBody>,res:Response<Api
     }
     const hashed_Password = await bcrypt.hash(password,SALT_ROUNDS);
     const result = await pool.query<User>(insert_sql,[name,email,hashed_Password]);
-    if(result.rowCount === 0){
-      throw new AppError("Insertion problem!",500);
-    }
     return res.status(201).json({
       success:true,
       message:"User registered successfully!",
@@ -36,18 +30,8 @@ export const registerUser=async(req:Request<{},{},RegisterBody>,res:Response<Api
 
 export const loginUser=async(req:Request<{},{},LoginBody>,res:Response<ApiResponse<{token:string} | null>>,next:NextFunction)=>{
   const {email,password}=req.body;
-  // if(!email || !password){
-  //   return res.status(400).json({
-  //     success:false,
-  //     message:"All field required!",
-  //     data:null
-  //   });
-  // }
   try {
     const result = await pool.query<User>("SELECT * FROM users WHERE email=$1",[email]);
-    if(result.rowCount === 0){
-      throw new AppError("Invalid email or password!",401);
-    }
     const user = result.rows[0];
     const compare_password = await bcrypt.compare(password,user.password);
 

@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteRoom = exports.updateRoom = exports.createRoom = exports.getRoomById = exports.getAvailableRooms = exports.getRooms = void 0;
-const db_1 = __importDefault(require("../db"));
+const db_1 = __importDefault(require("../config/db"));
 const pagination_1 = require("../utils/pagination");
 const AppError_1 = require("../utils/AppError");
 const getRooms = async (req, res, next) => {
@@ -31,13 +31,7 @@ const getRooms = async (req, res, next) => {
         });
     }
     catch (error) {
-        console.log("DATABASE_ERROR:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Internal server error!",
-            data: [],
-            pagination: (0, pagination_1.buildPaginationMeta)(1, 10, 0),
-        });
+        next(error);
     }
 };
 exports.getRooms = getRooms;

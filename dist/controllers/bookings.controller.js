@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBookingByGuestId = exports.cancelBooking = exports.createBooking = exports.getBookingById = exports.getBookings = void 0;
-const db_1 = __importDefault(require("../db"));
+const db_1 = __importDefault(require("../config/db"));
 const pagination_1 = require("../utils/pagination");
 const AppError_1 = require("../utils/AppError");
 const getBookings = async (req, res, next) => {
@@ -22,13 +22,7 @@ const getBookings = async (req, res, next) => {
         });
     }
     catch (error) {
-        console.log("DATABASE_ERROR: ", error);
-        return res.status(500).json({
-            success: false,
-            message: "Internal server problem",
-            data: [],
-            pagination: (0, pagination_1.buildPaginationMeta)(1, 10, 0)
-        });
+        next(error);
     }
 };
 exports.getBookings = getBookings;
@@ -68,10 +62,6 @@ const createBooking = async (req, res, next) => {
         const check_in_date = new Date(check_in);
         const check_out_date = new Date(check_out);
         const oneDay = 1000 * 60 * 60 * 24;
-        // if(check_in_date >= check_out_date){
-        //   await client.query("ROLLBACK");
-        //   return res.status(400).json({success:false,message:"Check-in date must be before check-out date!",data:null})
-        // }
         const diffInTime = check_out_date.getTime() - check_in_date.getTime();
         const total_day = Math.round(diffInTime / oneDay);
         const roomPrice = room_detail.rows[0].price;
@@ -107,7 +97,6 @@ const cancelBooking = async (req, res, next) => {
             throw new AppError_1.AppError("Booking not found!", 404);
         }
         if (booking_detail.rows[0].status === "cancelled") {
-            await client.query("ROLLBACK");
             throw new AppError_1.AppError("Already cancelled room!", 400);
         }
         const result = await client.query(sql, ["cancelled", id]);

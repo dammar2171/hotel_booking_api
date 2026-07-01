@@ -1,4 +1,4 @@
-import pool from "../db";
+import pool from "../config/db";
 import { NextFunction, Request,Response } from "express";
 import { ApiResponse, CreateRoomsBody, PaginatedResponse, PaginationQuery, Rooms } from "../types/types";
 import { buildPaginationMeta, getPagination } from "../utils/pagination";

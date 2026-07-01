@@ -4,7 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getStats = void 0;
-const db_1 = __importDefault(require("../db"));
+const db_1 = __importDefault(require("../config/db"));
 const getStats = async (req, res, next) => {
     try {
         const roomStat = await db_1.default.query(`

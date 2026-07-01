@@ -6,14 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.loginUser = exports.registerUser = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const db_1 = __importDefault(require("../db"));
+const db_1 = __importDefault(require("../config/db"));
 const AppError_1 = require("../utils/AppError");
 const SALT_ROUNDS = 10;
 const registerUser = async (req, res, next) => {
     const { name, email, password } = req.body;
-    // if(!name || !email || !password){
-    //   return res.status(400).json({success:false,message:"All fields are required!",data:null});
-    // }
     const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING id,name,email,role,created_at;";
     try {
         const existing_email = await db_1.default.query("SELECT * FROM users WHERE email = $1", [email]);
@@ -22,9 +19,6 @@ const registerUser = async (req, res, next) => {
         }
         const hashed_Password = await bcrypt_1.default.hash(password, SALT_ROUNDS);
         const result = await db_1.default.query(insert_sql, [name, email, hashed_Password]);
-        if (result.rowCount === 0) {
-            throw new AppError_1.AppError("Insertion problem!", 500);
-        }
         return res.status(201).json({
             success: true,
             message: "User registered successfully!",
@@ -38,18 +32,8 @@ const registerUser = async (req, res, next) => {
 exports.registerUser = registerUser;
 const loginUser = async (req, res, next) => {
     const { email, password } = req.body;
-    // if(!email || !password){
-    //   return res.status(400).json({
-    //     success:false,
-    //     message:"All field required!",
-    //     data:null
-    //   });
-    // }
     try {
         const result = await db_1.default.query("SELECT * FROM users WHERE email=$1", [email]);
-        if (result.rowCount === 0) {
-            throw new AppError_1.AppError("Invalid email or password!", 401);
-        }
         const user = result.rows[0];
         const compare_password = await bcrypt_1.default.compare(password, user.password);
         if (!compare_password) {
