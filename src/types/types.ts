@@ -100,8 +100,9 @@ export interface Stats{
   occupiedRooms:number;
   totalGuests:number;
   totalBookings:number
-  confirmedBooking:number;
-  cancelledBooking:number;
+  confirmedBookings:number;
+  cancelledBookings:number;
   totalRevenue:number;
   occupancyRate:number;
+  topBookingRoom:string;
 }

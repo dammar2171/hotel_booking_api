@@ -6,7 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getBookingByGuestId = exports.cancelBooking = exports.createBooking = exports.getBookingById = exports.getBookings = void 0;
 const db_1 = __importDefault(require("../db"));
 const pagination_1 = require("../utils/pagination");
-const getBookings = async (req, res) => {
+const AppError_1 = require("../utils/AppError");
+const getBookings = async (req, res, next) => {
     const { currentPage, pageLimit, offset } = (0, pagination_1.getPagination)(req.query.page, req.query.limit);
     try {
         const totalCount = await db_1.default.query(" SELECT COUNT(*) as total FROM bookings");
@@ -15,7 +16,7 @@ const getBookings = async (req, res) => {
         const result = await db_1.default.query(sql, [pageLimit, offset]);
         return res.status(200).json({
             success: true,
-            message: result.rows ? "No booking found!" : "Booking fetched successfully!",
+            message: result.rows.length === 0 ? "No booking found!" : "Booking fetched successfully!",
             data: result.rows,
             pagination: (0, pagination_1.buildPaginationMeta)(currentPage, pageLimit, totalItem)
         });
@@ -31,23 +32,22 @@ const getBookings = async (req, res) => {
     }
 };
 exports.getBookings = getBookings;
-const getBookingById = async (req, res) => {
+const getBookingById = async (req, res, next) => {
     const id = Number(req.params.id);
     const sql = "SELECT * FROM bookings WHERE id = $1;";
     try {
         const result = await db_1.default.query(sql, [id]);
         if (result.rowCount === 0) {
-            return res.status(404).json({ success: false, message: "No booking found!", data: null });
+            throw new AppError_1.AppError("No booking found!", 404);
         }
         return res.status(200).json({ success: true, message: "Booking fetched successfully", data: result.rows[0] });
     }
     catch (error) {
-        console.log("DATABASE_ERROR: ", error);
-        return res.status(500).json({ success: false, message: "Internal server problem", data: null });
+        next(error);
     }
 };
 exports.getBookingById = getBookingById;
-const createBooking = async (req, res) => {
+const createBooking = async (req, res, next) => {
     const { guest_id, room_id, check_in, check_out } = req.body;
     const sql = "INSERT INTO bookings (guest_id,room_id,check_in,check_out,total_price,status)VALUES($1,$2,$3,$4,$5,$6) RETURNING *;";
     const check_room_sql = "SELECT * FROM rooms WHERE id=$1;";
@@ -58,12 +58,12 @@ const createBooking = async (req, res) => {
         const room_detail = await client.query(check_room_sql, [room_id]);
         if (room_detail.rowCount === 0) {
             await client.query("ROLLBACK");
-            return res.status(404).json({ success: false, message: "Room not found!", data: null });
+            throw new AppError_1.AppError("Room not found!", 404);
         }
         const room_available = room_detail.rows[0].is_available;
         if (!room_available) {
             await client.query("ROLLBACK");
-            return res.status(400).json({ success: false, message: "Room is not available!", data: null });
+            throw new AppError_1.AppError("Room is not available!", 400);
         }
         const check_in_date = new Date(check_in);
         const check_out_date = new Date(check_out);
@@ -79,7 +79,7 @@ const createBooking = async (req, res) => {
         const result = await client.query(sql, [guest_id, room_id, check_in, check_out, total_price, "confirmed"]);
         if (result.rowCount === 0) {
             await client.query("ROLLBACK");
-            return res.status(500).json({ success: false, message: "Insertion problem!", data: null });
+            throw new AppError_1.AppError("Insertion problem!", 500);
         }
         await client.query(update_room_sql, [false, room_id]);
         await client.query("COMMIT");
@@ -87,15 +87,14 @@ const createBooking = async (req, res) => {
     }
     catch (error) {
         await client.query('ROLLBACK');
-        console.log("DATABASE_ERROR: ", error);
-        return res.status(500).json({ success: false, message: "Internal server problem", data: null });
+        next(error);
     }
     finally {
         client.release();
     }
 };
 exports.createBooking = createBooking;
-const cancelBooking = async (req, res) => {
+const cancelBooking = async (req, res, next) => {
     const id = Number(req.params.id);
     const booking_detail_sql = "SELECT * FROM bookings WHERE id=$1;";
     const sql = "UPDATE bookings SET status = $1 WHERE id=$2 RETURNING *;";
@@ -105,16 +104,16 @@ const cancelBooking = async (req, res) => {
         await client.query("BEGIN");
         const booking_detail = await client.query(booking_detail_sql, [id]);
         if (booking_detail.rowCount === 0) {
-            return res.status(404).json({ success: false, message: "Booking not found!", data: null });
+            throw new AppError_1.AppError("Booking not found!", 404);
         }
         if (booking_detail.rows[0].status === "cancelled") {
             await client.query("ROLLBACK");
-            return res.status(400).json({ success: false, message: "Already cancelled room!", data: null });
+            throw new AppError_1.AppError("Already cancelled room!", 400);
         }
         const result = await client.query(sql, ["cancelled", id]);
         if (result.rowCount === 0) {
             await client.query("ROLLBACK");
-            return res.status(400).json({ success: false, message: "Updation problem!", data: null });
+            throw new AppError_1.AppError("Updation problem!", 404);
         }
         const room_id = result.rows[0].room_id;
         await client.query(update_room_available_sql, [true, room_id]);
@@ -123,27 +122,25 @@ const cancelBooking = async (req, res) => {
     }
     catch (error) {
         await client.query("ROLLBACK");
-        console.log("DATABASE_ERROR: ", error);
-        return res.status(500).json({ success: false, message: "Internal server problem", data: null });
+        next(error);
     }
     finally {
         client.release();
     }
 };
 exports.cancelBooking = cancelBooking;
-const getBookingByGuestId = async (req, res) => {
+const getBookingByGuestId = async (req, res, next) => {
     const guestId = Number(req.params.guestId);
     const sql = "SELECT * FROM bookings WHERE guest_id=$1;";
     try {
         const result = await db_1.default.query(sql, [guestId]);
         if (result.rowCount === 0) {
-            return res.status(404).json({ success: false, message: "No guest found with booking!", data: null });
+            throw new AppError_1.AppError("No guest found with booking!", 404);
         }
         return res.status(200).json({ success: true, message: "Guest found with booking!", data: result.rows });
     }
     catch (error) {
-        console.log("DATABASE_ERROR: ", error);
-        return res.status(500).json({ success: false, message: "Internal server problem", data: null });
+        next(error);
     }
 };
 exports.getBookingByGuestId = getBookingByGuestId;

@@ -10,6 +10,8 @@ const rooms_route_1 = __importDefault(require("./routes/rooms.route"));
 const guests_route_1 = __importDefault(require("./routes/guests.route"));
 const bookings_route_1 = __importDefault(require("./routes/bookings.route"));
 const auth_route_1 = __importDefault(require("./routes/auth.route"));
+const stats_route_1 = __importDefault(require("./routes/stats.route"));
+const errorHandler_1 = require("./middleware/errorHandler");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 const port = process.env.PORT || 3000;
@@ -20,6 +22,8 @@ app.use("/auth", auth_route_1.default);
 app.use("/rooms", rooms_route_1.default);
 app.use("/guests", guests_route_1.default);
 app.use("/bookings", bookings_route_1.default);
+app.use("/stats", stats_route_1.default);
+app.use(errorHandler_1.errorHandler);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
     console.log(`Open http://localhost:${port} in your browser`);
