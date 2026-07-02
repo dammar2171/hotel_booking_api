@@ -84,8 +84,8 @@ router.get("/:id", auth_1.authenticate, rooms_controller_1.getRoomById);
  *         description: Room created successfully
  *       401:
  *         description: Unauthorized
- *       403:
- *         description: Admins only
+ *       500:
+ *         description: Internal server error
  */
 router.post("/", auth_1.authenticate, auth_1.authorizeAdmin, (0, validate_1.validate)(rooms_schema_1.createRoomSchema), rooms_controller_1.createRoom);
 /**

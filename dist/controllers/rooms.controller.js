@@ -69,9 +69,6 @@ const createRoom = async (req, res, next) => {
     const sql = "INSERT INTO rooms(room_number,type,price,is_available)VALUES($1,$2,$3,$4) RETURNING *;";
     try {
         const result = await db_1.default.query(sql, [room_number, type, price, is_available]);
-        if (result.rowCount === 0) {
-            throw new AppError_1.AppError("Insertion Problem!", 500);
-        }
         return res.status(201).json({ success: true, message: "Room created sucessfully!", data: result.rows[0] });
     }
     catch (error) {
