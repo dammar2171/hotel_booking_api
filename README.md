@@ -289,7 +289,7 @@ UPDATE users SET role = 'admin' WHERE email = 'your@email.com';
 
 Interactive Swagger documentation available at:
 
-- http://localhost:3000/api-docs
+- http://localhost:5000/api-docs
 
 ---
 
