@@ -50,7 +50,8 @@ hotel-booking-api/
 │
 ├── src/
 │   ├── config/
-│   │   └── swagger.ts
+│   │   ├── swagger.ts
+|   |   └── db.ts 
 │   │
 │   ├── controllers/
 │   │   ├── auth.controller.ts
@@ -84,7 +85,6 @@ hotel-booking-api/
 │   │   ├── AppError.ts
 │   │   └── pagination.ts
 │   │
-│   ├── db.ts
 │   └── index.ts
 │
 ├── .env.example
