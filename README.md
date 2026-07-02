@@ -43,40 +43,56 @@ A production-style REST API for managing hotel room bookings, built with **Node.
 
 ---
 
-## 📁 Project Structure
+## 📂 Project Structure
 
-src/
-├── config/
-│ └── swagger.ts
-├── controllers/
-│ ├── auth.controller.ts
-│ ├── rooms.controller.ts
-│ ├── guests.controller.ts
-│ ├── bookings.controller.ts
-│ └── stats.controller.ts
-├── middleware/
-│ ├── auth.ts
-│ ├── validate.ts
-│ └── errorHandler.ts
-├── routes/
-│ ├── auth.routes.ts
-│ ├── rooms.routes.ts
-│ ├── guests.routes.ts
-│ ├── bookings.routes.ts
-│ └── stats.routes.ts
-├── schemas/
-│ ├── auth.schema.ts
-│ ├── rooms.schema.ts
-│ ├── guests.schema.ts
-│ └── bookings.schema.ts
-├── types/
-│ └── index.ts
-├── utils/
-│ ├── AppError.ts
-│ └── pagination.ts
-├── db.ts
-└── index.ts
-
+```text
+hotel-booking-api/
+│
+├── src/
+│   ├── config/
+│   │   └── swagger.ts
+│   │
+│   ├── controllers/
+│   │   ├── auth.controller.ts
+│   │   ├── rooms.controller.ts
+│   │   ├── guests.controller.ts
+│   │   ├── bookings.controller.ts
+│   │   └── stats.controller.ts
+│   │
+│   ├── middleware/
+│   │   ├── auth.ts
+│   │   ├── validate.ts
+│   │   └── errorHandler.ts
+│   │
+│   ├── routes/
+│   │   ├── auth.routes.ts
+│   │   ├── rooms.routes.ts
+│   │   ├── guests.routes.ts
+│   │   ├── bookings.routes.ts
+│   │   └── stats.routes.ts
+│   │
+│   ├── schemas/
+│   │   ├── auth.schema.ts
+│   │   ├── rooms.schema.ts
+│   │   ├── guests.schema.ts
+│   │   └── bookings.schema.ts
+│   │
+│   ├── types/
+│   │   └── index.ts
+│   │
+│   ├── utils/
+│   │   ├── AppError.ts
+│   │   └── pagination.ts
+│   │
+│   ├── db.ts
+│   └── index.ts
+│
+├── .env.example
+├── .gitignore
+├── package.json
+├── tsconfig.json
+└── README.md
+```
 ---
 
 ## ⚙️ Getting Started
