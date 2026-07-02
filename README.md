@@ -4,8 +4,8 @@ A production-style REST API for managing hotel room bookings, built with **Node.
 
 ## 🚀 Live Demo
 
-> API Base URL: `http://localhost:3000`
-> API Docs: `http://localhost:3000/api-docs`
+> API Base URL: `http://localhost:5000`
+> API Docs: `http://localhost:5000/api-docs`
 
 ---
 
