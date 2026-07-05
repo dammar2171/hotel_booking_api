@@ -10,7 +10,14 @@ const db_1 = __importDefault(require("../config/db"));
 const AppError_1 = require("../utils/AppError");
 const SALT_ROUNDS = 10;
 const registerUser = async (req, res, next) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, confirmPsd } = req.body;
+    if (password !== confirmPsd) {
+        return res.status(400).json({
+            success: false,
+            message: "Password and confirm password do not matched! Try again.",
+            data: null
+        });
+    }
     const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING id,name,email,role,created_at;";
     try {
         const existing_email = await db_1.default.query("SELECT * FROM users WHERE email = $1", [email]);

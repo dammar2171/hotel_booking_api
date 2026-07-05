@@ -9,7 +9,14 @@ import { AppError } from '../utils/AppError';
 const SALT_ROUNDS = 10;
 
 export const registerUser=async(req:Request<{},{},RegisterBody>,res:Response<ApiResponse<Omit<User,"password"> | null>>,next:NextFunction)=>{
-  const {name,email,password}=req.body;
+  const {name,email,password,confirmPsd}=req.body;
+  if(password !== confirmPsd){
+    return res.status(400).json({
+      success:false,
+      message:"Password and confirm password do not matched! Try again.",
+      data:null
+    })
+  }
   const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING id,name,email,role,created_at;";
   try {
     const existing_email = await pool.query<User>("SELECT * FROM users WHERE email = $1",[email]);

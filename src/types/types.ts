@@ -64,6 +64,7 @@ export interface RegisterBody{
   name:string;
   email:string;
   password:string;
+  confirmPsd:string;
 }
 
 export interface LoginBody{

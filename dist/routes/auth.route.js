@@ -22,6 +22,8 @@ const router = (0, express_1.Router)();
  *       201:
  *         description: User registered successfully
  *       400:
+ *         description: Password and confirm password do not  matched! Try again.
+ *       400:
  *         description:Email already existed
  *       500:
  *         description: Internal server error
