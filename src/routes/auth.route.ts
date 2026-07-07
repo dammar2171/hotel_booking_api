@@ -88,7 +88,7 @@ router.post("/login", validate(loginUserSchema),loginUser);
  *               data:
  *                 id: 1
  *                 name: John Doe
- *                 email: john@example.com
+ *                 email: john@gmail.com
  *                 role: user
  *                 created_at: 2026-07-07T10:00:00Z
  *       404:
