@@ -37,6 +37,10 @@ const options = {
                         type: { type: "string", example: "deluxe" },
                         price: { type: "number", example: 5000 },
                         is_available: { type: "boolean", example: true },
+                        description: { type: "string", example: "Best for stay" },
+                        image_url: { type: "string", example: "abcd.jpg" },
+                        rating: { type: "number", example: 4.5 },
+                        ammenities: { type: "string", example: "wifi,ac,tv" }
                     },
                 },
                 CreateRoomBody: {
@@ -47,6 +51,10 @@ const options = {
                         type: { type: "string", example: "deluxe" },
                         price: { type: "number", example: 5000 },
                         is_available: { type: "boolean", example: true },
+                        description: { type: "string", example: "Best for stay" },
+                        image_url: { type: "string", example: "abcd.jpg" },
+                        rating: { type: "number", example: 4.5 },
+                        ammenities: { type: "string", example: "wifi,ac,tv" }
                     },
                 },
                 // ── Guests ─────────────────────────────────────

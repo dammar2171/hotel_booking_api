@@ -4,6 +4,10 @@ export interface Rooms{
   type:string;
   price:number;
   is_available:boolean;
+  description:  string | null;
+  image_url:    string | null;
+  rating:       number | null;
+  amenities:    string[] | null;
 }
 
 export interface CreateRoomsBody{
@@ -11,6 +15,10 @@ export interface CreateRoomsBody{
   type:string;
   price:number;
   is_available:boolean;
+  description?:  string | null;
+  image_url?:    string | null;
+  rating?:       number | null;
+  amenities?:    string[] | null;
 }
 
 export interface Guests{

@@ -68,10 +68,14 @@ export const getRoomById = async(req:Request<{id:string}>,res:Response<ApiRespon
 }
 
 export const createRoom=async(req:Request<{},{},CreateRoomsBody>,res:Response<ApiResponse<Rooms | null>>,next:NextFunction)=>{
-  const {room_number,type,price,is_available} = req.body;
-  const sql = "INSERT INTO rooms(room_number,type,price,is_available)VALUES($1,$2,$3,$4) RETURNING *;";
+  const {room_number,type,price,is_available,description,
+      image_url, rating, amenities} = req.body;
+  const sql = "INSERT INTO rooms(room_number,type,price,is_available,description,image_url, rating, amenities)VALUES($1,$2,$3,$4,$5,$6,$7,$8) RETURNING *;";
   try {
-    const result = await pool.query<Rooms>(sql,[room_number,type,price,is_available]);
+    const result = await pool.query<Rooms>(sql,[room_number,type,price,is_available,description ?? null,
+       image_url   ?? null,
+       rating      ?? null,
+       amenities   ?? null]);
     return res.status(201).json({success:true,message:"Room created sucessfully!",data:result.rows[0]});
   } catch (error) {
     next(error)
@@ -80,10 +84,25 @@ export const createRoom=async(req:Request<{},{},CreateRoomsBody>,res:Response<Ap
 
 export const updateRoom =  async(req:Request<{id:string}>,res:Response<ApiResponse<Rooms | null>>,next:NextFunction)=>{
   const id = Number(req.params.id);
-  const {room_number,type,price,is_available} = req.body;
-  const sql = "UPDATE rooms SET room_number = COALESCE($1,room_number),type=COALESCE($2,type), price=COALESCE($3,price),is_available=COALESCE($4,is_available) WHERE id = $5 RETURNING *;";
+  const {room_number, type, price,
+      is_available, description,
+      image_url, rating, amenities} = req.body;
   try {
-    const result = await pool.query<Rooms>(sql,[room_number,type,price,is_available,id]);
+    const result = await pool.query<Rooms>(
+      `UPDATE rooms SET
+        room_number  = COALESCE($1, room_number),
+        type         = COALESCE($2, type),
+        price        = COALESCE($3, price),
+        is_available = COALESCE($4, is_available),
+        description  = COALESCE($5, description),
+        image_url    = COALESCE($6, image_url),
+        rating       = COALESCE($7, rating),
+        amenities    = COALESCE($8, amenities)
+       WHERE id = $9
+       RETURNING *;`,
+      [room_number, type, price, is_available,
+       description, image_url, rating, amenities, id]
+    );
     if(result.rowCount === 0){
       throw new AppError("Room not found!",404);
     }
