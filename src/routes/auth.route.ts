@@ -60,7 +60,7 @@ router.post("/login", validate(loginUserSchema),loginUser);
 
 /**
  * @swagger
- * /auth/{id}/password:
+ * /{id}/password:
  *   put:
  *     summary: Update user password
  *     description: Update a user's password and return updated data.
