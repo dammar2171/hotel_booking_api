@@ -61,10 +61,16 @@ router.post("/login", validate(loginUserSchema),loginUser);
 /**
  * @swagger
  * /auth/{id}/password:
- *   post:
- *     summary: Update user
- *     description: Update a user and returns a updated data.
+ *   put:
+ *     summary: Update user password
+ *     description: Update a user's password and return updated data.
  *     tags: [Authentication]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
  *     requestBody:
  *       required: true
  *       content:
@@ -79,13 +85,16 @@ router.post("/login", validate(loginUserSchema),loginUser);
  *             example:
  *               success: true
  *               message: Password changed!
- *               data:{
- *                      id,name,email,role,created_at
- *                    }
+ *               data:
+ *                 id: 1
+ *                 name: John Doe
+ *                 email: john@example.com
+ *                 role: user
+ *                 created_at: 2026-07-07T10:00:00Z
  *       404:
  *         description: User not found!
  *       401:
- *         description:Current password do not matched. Try again!
+ *         description: Current password does not match. Try again!
  *       500:
  *         description: Internal server error
  */
