@@ -13,7 +13,7 @@ A production-style REST API for managing hotel room bookings, built with **Node.
 
 - ✅ JWT Authentication with bcrypt password hashing
 - ✅ Role-based access control (Admin / User)
-- ✅ Full CRUD for Rooms, Guests, and Bookings
+- ✅ Full CRUD for Rooms, User, Guests, and Bookings
 - ✅ Database transactions for booking logic
 - ✅ Runtime validation with Zod
 - ✅ Pagination and filtering on list endpoints
@@ -51,7 +51,7 @@ hotel-booking-api/
 ├── src/
 │   ├── config/
 │   │   ├── swagger.ts
-|   |   └── db.ts 
+|   |   └── db.ts
 │   │
 │   ├── controllers/
 │   │   ├── auth.controller.ts
@@ -93,6 +93,7 @@ hotel-booking-api/
 ├── tsconfig.json
 └── README.md
 ```
+
 ---
 
 ## ⚙️ Getting Started
@@ -188,10 +189,11 @@ npm start
 
 ### Auth
 
-| Method | Endpoint         | Description         | Auth   |
-| ------ | ---------------- | ------------------- | ------ |
-| POST   | `/auth/register` | Register new user   | Public |
-| POST   | `/auth/login`    | Login and get token | Public |
+| Method | Endpoint             | Description         | Auth   |
+| ------ | -------------------- | ------------------- | ------ |
+| POST   | `/auth/register`     | Register new user   | Public |
+| POST   | `/auth/login`        | Login and get token | Public |
+| POST   | `/auth/:id/password` | update and get data | User   |
 
 ### Rooms
 
