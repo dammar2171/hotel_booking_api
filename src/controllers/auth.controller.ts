@@ -2,20 +2,16 @@ import { NextFunction, Request,Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import pool from '../config/db'
-import { User,RegisterBody,LoginBody,JwtPayload,ApiResponse } from '../types/types';
+import { User,RegisterBody,LoginBody,JwtPayload,ApiResponse, LoginResponse, updateUserBody } from '../types/types';
 import { AppError } from '../utils/AppError';
-
 
 const SALT_ROUNDS = 10;
 
 export const registerUser=async(req:Request<{},{},RegisterBody>,res:Response<ApiResponse<Omit<User,"password"> | null>>,next:NextFunction)=>{
   const {name,email,password,confirmPsd}=req.body;
+  
   if(password !== confirmPsd){
-    return res.status(400).json({
-      success:false,
-      message:"Password and confirm password do not matched! Try again.",
-      data:null
-    })
+    throw new AppError("Password and confirm password do not matched! Try again.",400);
   }
   const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING id,name,email,role,created_at;";
   try {
@@ -35,10 +31,13 @@ export const registerUser=async(req:Request<{},{},RegisterBody>,res:Response<Api
   }
 }
 
-export const loginUser=async(req:Request<{},{},LoginBody>,res:Response<ApiResponse<{token:string} | null>>,next:NextFunction)=>{
+export const loginUser=async(req:Request<{},{},LoginBody>,res:Response<ApiResponse<LoginResponse | null>>,next:NextFunction)=>{
   const {email,password}=req.body;
   try {
     const result = await pool.query<User>("SELECT * FROM users WHERE email=$1",[email]);
+    if(result.rowCount === 0){
+      throw new AppError("User not found!",404);
+    }
     const user = result.rows[0];
     const compare_password = await bcrypt.compare(password,user.password);
 
@@ -58,13 +57,47 @@ export const loginUser=async(req:Request<{},{},LoginBody>,res:Response<ApiRespon
 
     const token = jwt.sign(payload, process.env.JWT_SECRET as string, signOptions);
 
+    const returnUser={
+      id:user.id,
+      name:user.name,
+      email:user.email,
+      role:user.role,
+    }
     return res.status(200).json({
       success:true,
       message:"Login successfully!",
-      data:{token}
+      data:{token, user:returnUser}
     })
 
   } catch (error) {
     next(error);
+  }
+}
+
+export const updateUserPassword = async(req:Request<{id:string},{},updateUserBody>,res:Response<ApiResponse<Omit<User,"password"> | null>>,next:NextFunction)=>{
+  const id = Number(req.params.id);
+  console.log(req.body);
+  const {currentPassword,newPassword} = req.body;
+  const getUserSql = "SELECT * FROM users WHERE id=$1";
+  const updateSql = "UPDATE users SET password=$1 WHERE id=$2 RETURNING id, name, email, role, created_at";
+  try {
+    const result = await pool.query<User>(getUserSql,[id]);
+    if(result.rowCount === 0){
+      throw new AppError("User not found!",404);
+    }
+    const user = result.rows[0];
+    const verifyPassword = await bcrypt.compare(currentPassword,user.password);
+    if(!verifyPassword){
+      throw new AppError("Current password do not matched. Try again!",401);
+    }
+    const hashPassword = await bcrypt.hash(newPassword,SALT_ROUNDS);
+    const UpdateResult = await pool.query<User>(updateSql,[hashPassword,id]);
+    return res.status(200).json({
+      success:true,
+      message:"Password changed!",
+      data:UpdateResult.rows[0],
+    })
+  } catch (error) {
+    next(error)
   }
 }

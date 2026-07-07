@@ -94,11 +94,12 @@ const options = {
                 // ── Auth ───────────────────────────────────────
                 RegisterBody: {
                     type: "object",
-                    required: ["name", "email", "password"],
+                    required: ["name", "email", "password", "confirmPsd"],
                     properties: {
                         name: { type: "string", example: "Dammar Bhatt" },
                         email: { type: "string", example: "dammar@email.com" },
                         password: { type: "string", example: "123456" },
+                        confirmPsd: { type: "string", example: "123456" },
                     },
                 },
                 LoginBody: {
@@ -106,7 +107,15 @@ const options = {
                     required: ["email", "password"],
                     properties: {
                         email: { type: "string", example: "dammar@email.com" },
-                        password: { type: "string", example: "123456" },
+                        password: { type: "string", example: "123456" }
+                    },
+                },
+                UpdateUserPasswordBody: {
+                    type: "object",
+                    required: ["currentPassword", "newPassword"],
+                    properties: {
+                        currentPassword: { type: "string", example: "test1234" },
+                        newPassword: { type: "string", example: "test123456" }
                     },
                 },
                 // ── API Response ───────────────────────────────

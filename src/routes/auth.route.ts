@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { loginUser, registerUser } from "../controllers/auth.controller";
-import { registerUserSchema,loginUserSchema } from "../schemas/auth.schema";
+import { loginUser, registerUser,updateUserPassword } from "../controllers/auth.controller";
+import { registerUserSchema,loginUserSchema, UpdateUserSchema } from "../schemas/auth.schema";
 import { validate } from "../middleware/validate";
 
 const router = Router();
@@ -20,8 +20,6 @@ const router = Router();
  *     responses:
  *       201:
  *         description: User registered successfully
- *       400:
- *         description: Password and confirm password do not  matched! Try again.
  *       400:
  *         description:Email already existed
  *       500:
@@ -58,5 +56,39 @@ router.post("/register", validate(registerUserSchema),registerUser);
  *         description: Internal server error
  */
 router.post("/login", validate(loginUserSchema),loginUser);
+
+
+/**
+ * @swagger
+ * /auth/{id}/password:
+ *   post:
+ *     summary: Update user
+ *     description: Update a user and returns a updated data.
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateUserPasswordBody'
+ *     responses:
+ *       200:
+ *         description: User updated
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: Password changed!
+ *               data:{
+ *                      id,name,email,role,created_at
+ *                    }
+ *       404:
+ *         description: User not found!
+ *       401:
+ *         description:Current password do not matched. Try again!
+ *       500:
+ *         description: Internal server error
+ */
+router.put("/:id/password", validate(UpdateUserSchema),updateUserPassword);
 
 export default router;

@@ -72,6 +72,11 @@ export interface LoginBody{
   password:string;
 }
 
+export interface updateUserBody{
+  currentPassword:string;
+  newPassword:string;
+}
+
 export interface JwtPayload{
   userId:number;
   email:string;
@@ -106,4 +111,14 @@ export interface Stats{
   totalRevenue:number;
   occupancyRate:number;
   topBookingRoom:string;
+}
+
+export interface LoginResponse{
+  token:string,
+  user: {
+    id: number;
+    name: string;
+    email: string;
+    role: "user" | "admin";
+  };
 }

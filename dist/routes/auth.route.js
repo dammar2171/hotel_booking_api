@@ -22,8 +22,6 @@ const router = (0, express_1.Router)();
  *       201:
  *         description: User registered successfully
  *       400:
- *         description: Password and confirm password do not  matched! Try again.
- *       400:
  *         description:Email already existed
  *       500:
  *         description: Internal server error
@@ -58,4 +56,36 @@ router.post("/register", (0, validate_1.validate)(auth_schema_1.registerUserSche
  *         description: Internal server error
  */
 router.post("/login", (0, validate_1.validate)(auth_schema_1.loginUserSchema), auth_controller_1.loginUser);
+/**
+ * @swagger
+ * /auth/{id}/password:
+ *   post:
+ *     summary: Update user
+ *     description: Update a user and returns a updated data.
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UpdateUserPasswordBody'
+ *     responses:
+ *       200:
+ *         description: User updated
+ *         content:
+ *           application/json:
+ *             example:
+ *               success: true
+ *               message: Password changed!
+ *               data:{
+ *                      id,name,email,role,created_at
+ *                    }
+ *       404:
+ *         description: User not found!
+ *       401:
+ *         description:Current password do not matched. Try again!
+ *       500:
+ *         description: Internal server error
+ */
+router.put("/:id/password", (0, validate_1.validate)(auth_schema_1.UpdateUserSchema), auth_controller_1.updateUserPassword);
 exports.default = router;
