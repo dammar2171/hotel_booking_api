@@ -82,6 +82,9 @@ const options: swaggerJsdoc.Options = {
             check_out:   { type: "string",  example: "2024-01-05" },
             total_price: { type: "number",  example: 20000 },
             status:      { type: "string",  example: "confirmed" },
+            guests:      { type:"number" ,example: 2 },
+            paymentMethod: { typee:"string", example:"online"},
+            specialRequest : { type:"string", example:"Need amazing alcohol after dinner"},
           },
         },
         CreateBookingBody: {
@@ -92,6 +95,9 @@ const options: swaggerJsdoc.Options = {
             room_id:   { type: "integer", example: 1 },
             check_in:  { type: "string",  example: "2024-01-01" },
             check_out: { type: "string",  example: "2024-01-05" },
+            guests:      { type:"number" ,example: 2 },
+            paymentMethod: { typee:"string", example:"online"},
+            specialRequest : { type:"string", example:"Need amazing alcohol after dinner"},
           },
         },
         // ── Auth ───────────────────────────────────────

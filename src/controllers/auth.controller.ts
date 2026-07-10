@@ -7,29 +7,52 @@ import { AppError } from '../utils/AppError';
 
 const SALT_ROUNDS = 10;
 
-export const registerUser=async(req:Request<{},{},RegisterBody>,res:Response<ApiResponse<Omit<User,"password"> | null>>,next:NextFunction)=>{
-  const {name,email,password,confirmPsd}=req.body;
-  
-  if(password !== confirmPsd){
-    throw new AppError("Password and confirm password do not matched! Try again.",400);
-  }
-  const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING id,name,email,role,created_at;";
+export const registerUser = async (req:Request<{},{},RegisterBody>, res:Response<ApiResponse<User>>, next:NextFunction) => {
+  const { name, email, password } = req.body;
+  const client = await pool.connect();
+
   try {
-    const existing_email = await pool.query<User>("SELECT * FROM users WHERE email = $1",[email]);
-    if(existing_email.rowCount && existing_email.rowCount > 0){
-      throw new AppError("Email already registered!",400);
+    await client.query("BEGIN");
+
+    const existing = await client.query(
+      "SELECT * FROM users WHERE email = $1", [email]
+    );
+    if (existing.rowCount && existing.rowCount > 0) {
+      await client.query("ROLLBACK");
+      throw new AppError("Email already registered!", 400);
     }
-    const hashed_Password = await bcrypt.hash(password,SALT_ROUNDS);
-    const result = await pool.query<User>(insert_sql,[name,email,hashed_Password]);
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const userResult = await client.query(
+      `INSERT INTO users (name, email, password)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, email, role`,
+      [name, email, hashedPassword]
+    );
+    const newUser = userResult.rows[0];
+
+    await client.query(
+      `INSERT INTO guests (name, email, phone, user_id)
+       VALUES ($1, $2, $3, $4)`,
+      [name, email, "", newUser.id]
+    );
+
+    await client.query("COMMIT");
+
     return res.status(201).json({
-      success:true,
-      message:"User registered successfully!",
-      data:result.rows[0]
-    })
+      success: true,
+      message: "User registered successfully!",
+      data:    newUser,
+    });
+
   } catch (error) {
+    await client.query("ROLLBACK");
     next(error);
+  } finally {
+    client.release();
   }
-}
+};
 
 export const loginUser=async(req:Request<{},{},LoginBody>,res:Response<ApiResponse<LoginResponse | null>>,next:NextFunction)=>{
   const {email,password}=req.body;

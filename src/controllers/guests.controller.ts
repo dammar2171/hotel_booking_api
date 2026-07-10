@@ -36,6 +36,25 @@ export const getGuestById = async (req: Request<{ id: string }>, res: Response<A
   }
 };
 
+export const getGuestByUserId = async (req:Request<{userId:string}>, res:Response<ApiResponse<Guests>>, next:NextFunction) => {
+  const userId = Number(req.params.userId);
+  try {
+    const result = await pool.query(
+      "SELECT * FROM guests WHERE user_id = $1", [userId]
+    );
+    if (result.rowCount === 0) {
+      throw new AppError("Guest profile not found!", 404);
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Guest found!",
+      data:    result.rows[0],
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createGuest = async (req: Request<{}, {}, CreateGuestBody>, res: Response<ApiResponse<Guests | null>>,next:NextFunction) => {
   const { name, email, phone } = req.body;
   const sql = "INSERT INTO guests(name,email,phone) VALUES($1,$2,$3) RETURNING *;";

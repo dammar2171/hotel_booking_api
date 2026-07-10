@@ -38,8 +38,8 @@ export const getBookingById =async(req:Request<{id:string}>,res:Response<ApiResp
 }
 
 export const createBooking = async(req:Request<{},{},CreateBookingBody>,res:Response<ApiResponse<Booking | null>>,next:NextFunction)=>{
-  const {guest_id,room_id,check_in,check_out}=req.body;
-  const sql = "INSERT INTO bookings (guest_id,room_id,check_in,check_out,total_price,status)VALUES($1,$2,$3,$4,$5,$6) RETURNING *;";
+  const {guest_id,room_id,check_in,check_out,guests,paymentMethod,specialRequest}=req.body;
+  const sql = "INSERT INTO bookings (guest_id,room_id,check_in,check_out,total_price,status,guests,payment_method,special_request)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *;";
   const check_room_sql = "SELECT * FROM rooms WHERE id=$1;";
   const update_room_sql = "UPDATE rooms SET is_available= $1 WHERE id =$2;";
   const client = await pool.connect();
@@ -63,7 +63,7 @@ export const createBooking = async(req:Request<{},{},CreateBookingBody>,res:Resp
 
     const roomPrice = room_detail.rows[0].price;
     const total_price = roomPrice * total_day;
-    const result =  await client.query<Booking>(sql,[guest_id,room_id,check_in,check_out,total_price,"confirmed"]);
+    const result =  await client.query<Booking>(sql,[guest_id,room_id,check_in,check_out,total_price,"confirmed",guests,paymentMethod,specialRequest]);
     if(result.rowCount === 0){
       await client.query("ROLLBACK");
       throw new AppError("Insertion problem!",500);

@@ -43,6 +43,9 @@ export interface Booking{
   check_out:string;
   total_price:number;
   status:BookingStatus
+  guests:number;
+  paymentMethod:string;
+  specialRequest:string | null;
 }
 
 export interface CreateBookingBody{
@@ -52,6 +55,9 @@ export interface CreateBookingBody{
   check_out:string;
   price:number;
   status:BookingStatus
+  guests:number;
+  paymentMethod:string;
+  specialRequest:string | null;
 }
 export interface ApiResponse<T>{
   success:boolean;

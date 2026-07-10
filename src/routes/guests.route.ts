@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getGuests, getGuestById, createGuest, deleteGuest ,updateGuest} from "../controllers/guests.controller";
+import { getGuests, getGuestById, createGuest, deleteGuest ,updateGuest, getGuestByUserId} from "../controllers/guests.controller";
 import { validate } from "../middleware/validate";
 import { createGuestSchema ,updateGuestSchema} from "../schemas/guests.schema";
 import { authenticate } from "../middleware/auth";
@@ -55,6 +55,28 @@ router.get("/",authenticate, getGuests);
  *         description: Internal server error
  */
 router.get("/:id",authenticate, getGuestById);
+
+/**
+ * @swagger
+ * /user/{userId}:
+ *   get:
+ *     summary: Get guest by user ID
+ *     tags: [Guests]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Guest found 
+ *       404:
+ *         description: Guest not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/user/:userId", authenticate, getGuestByUserId);
 
 /**
  * @swagger

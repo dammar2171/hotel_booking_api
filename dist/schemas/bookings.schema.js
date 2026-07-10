@@ -16,6 +16,9 @@ exports.createBookingSchema = zod_1.z
         .refine((val) => !isNaN(Date.parse(val)), {
         message: "check_out must be a valid date",
     }),
+    guests: zod_1.z.number().int().min(1).optional(),
+    payment_method: zod_1.z.enum(["hotel", "online", "card"]).optional(),
+    special_request: zod_1.z.string().optional(),
 })
     .refine((data) => new Date(data.check_out) > new Date(data.check_in), {
     message: "check_out must be after check_in",

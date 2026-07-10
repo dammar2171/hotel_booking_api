@@ -42,8 +42,8 @@ const getBookingById = async (req, res, next) => {
 };
 exports.getBookingById = getBookingById;
 const createBooking = async (req, res, next) => {
-    const { guest_id, room_id, check_in, check_out } = req.body;
-    const sql = "INSERT INTO bookings (guest_id,room_id,check_in,check_out,total_price,status)VALUES($1,$2,$3,$4,$5,$6) RETURNING *;";
+    const { guest_id, room_id, check_in, check_out, guests, paymentMethod, specialRequest } = req.body;
+    const sql = "INSERT INTO bookings (guest_id,room_id,check_in,check_out,total_price,status,guests,payment_method,special_request)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *;";
     const check_room_sql = "SELECT * FROM rooms WHERE id=$1;";
     const update_room_sql = "UPDATE rooms SET is_available= $1 WHERE id =$2;";
     const client = await db_1.default.connect();
@@ -66,7 +66,7 @@ const createBooking = async (req, res, next) => {
         const total_day = Math.round(diffInTime / oneDay);
         const roomPrice = room_detail.rows[0].price;
         const total_price = roomPrice * total_day;
-        const result = await client.query(sql, [guest_id, room_id, check_in, check_out, total_price, "confirmed"]);
+        const result = await client.query(sql, [guest_id, room_id, check_in, check_out, total_price, "confirmed", guests, paymentMethod, specialRequest]);
         if (result.rowCount === 0) {
             await client.query("ROLLBACK");
             throw new AppError_1.AppError("Insertion problem!", 500);
