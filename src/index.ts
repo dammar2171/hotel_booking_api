@@ -7,6 +7,7 @@ import guestsRoutes from './routes/guests.route';
 import bookingsRoutes from './routes/bookings.route';
 import authRoutes from './routes/auth.route';
 import statsRoute from './routes/stats.route';
+import contactRoute from './routes/contacts.route';
 import pool from './config/db';
 import { errorHandler } from './middleware/errorHandler';
 import helmet from 'helmet';
@@ -57,6 +58,7 @@ app.use("/auth",authRoutes);
 app.use("/rooms",roomsRoutes);
 app.use("/guests",guestsRoutes);
 app.use("/bookings",bookingsRoutes);
+app.use("/contacts",contactRoute);
 app.use("/stats",statsRoute);
 
 app.use(errorHandler);

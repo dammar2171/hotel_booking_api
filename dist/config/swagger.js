@@ -57,6 +57,29 @@ const options = {
                         ammenities: { type: "string", example: "wifi,ac,tv" }
                     },
                 },
+                // ── Contacts ─────────────────────────────────────
+                Contacts: {
+                    type: "object",
+                    properties: {
+                        id: { type: "integer", example: 1 },
+                        name: { type: "string", example: "Dammar Bhatt" },
+                        email: { type: "string", example: "dammar@email.com" },
+                        phone: { type: "string", example: "9800000000" },
+                        subject: { type: "string", example: "wifi issue" },
+                        message: { type: "string", example: "Here in hotel wifi is not working properly" },
+                    },
+                },
+                CreateContactBody: {
+                    type: "object",
+                    required: ["name", "email", "message"],
+                    properties: {
+                        name: { type: "string", example: "Dammar Bhatt" },
+                        email: { type: "string", example: "dammar@email.com" },
+                        phone: { type: "string", example: "9800000000" },
+                        subject: { type: "string", example: "wifi issue" },
+                        message: { type: "string", example: "Here in hotel wifi is not working properly" },
+                    },
+                },
                 // ── Guests ─────────────────────────────────────
                 Guest: {
                     type: "object",

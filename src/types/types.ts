@@ -136,3 +136,19 @@ export interface LoginResponse{
     role: "user" | "admin";
   };
 }
+
+export interface Contact{
+  id:number;
+  name:string;
+  email:string;
+  phone:string;
+  subject:string;
+  message:string;
+}
+export interface ContactBody{
+  name:string;
+  email:string;
+  phone:string;
+  subject:string;
+  message:string;
+}

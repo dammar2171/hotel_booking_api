@@ -58,7 +58,8 @@ hotel-booking-api/
 │   │   ├── rooms.controller.ts
 │   │   ├── guests.controller.ts
 │   │   ├── bookings.controller.ts
-│   │   └── stats.controller.ts
+│   │   ├── stats.controller.ts
+│   │   └── contacts.controller.ts
 │   │
 │   ├── middleware/
 │   │   ├── auth.ts
@@ -70,12 +71,14 @@ hotel-booking-api/
 │   │   ├── rooms.routes.ts
 │   │   ├── guests.routes.ts
 │   │   ├── bookings.routes.ts
+│  │    ├── contacts.routes.ts
 │   │   └── stats.routes.ts
 │   │
 │   ├── schemas/
 │   │   ├── auth.schema.ts
 │   │   ├── rooms.schema.ts
 │   │   ├── guests.schema.ts
+│   │  ├── guests.schema.ts
 │   │   └── bookings.schema.ts
 │   │
 │   ├── types/
@@ -157,6 +160,7 @@ CREATE TABLE guests (
   name  VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
   phone VARCHAR(20)  NOT NULL
+  user_id     INTEGER      NOT NULL REFERENCES users(id),
 );
 
 CREATE TABLE bookings (
@@ -168,6 +172,17 @@ CREATE TABLE bookings (
   total_price DECIMAL(10,2),
   status      VARCHAR(20)  NOT NULL DEFAULT 'confirmed'
 );
+
+CREATE TABLE contacts (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) NOT NULL,
+  phone VARCHAR(20),
+  subject VARCHAR(250),
+  message TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 ```
 
 ### Run the Project
@@ -216,9 +231,16 @@ npm start
 | PUT    | `/guests/:id` | Update guest               | User |
 | DELETE | `/guests/:id` | Delete guest               | User |
 
+### Contacts
+
+| Method | Endpoint        | Description      | Auth  |
+| ------ | --------------- | ---------------- | ----- |
+| GET    | `/contacts`     | Get all contacts | admin |
+| DELETE | `/contacts/:id` | Delete contacts  | admin |
+
 ### Bookings
 
-| Method | Endpoint                   | Description                  | Auth |
+| Method | Endpoint                   | Description Auth             |
 | ------ | -------------------------- | ---------------------------- | ---- |
 | GET    | `/bookings`                | Get all bookings (paginated) | User |
 | GET    | `/bookings/:id`            | Get booking by ID            | User |
