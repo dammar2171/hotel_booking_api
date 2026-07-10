@@ -56,6 +56,27 @@ router.get("/", auth_1.authenticate, guests_controller_1.getGuests);
 router.get("/:id", auth_1.authenticate, guests_controller_1.getGuestById);
 /**
  * @swagger
+ * /guests/user/{userId}:
+ *   get:
+ *     summary: Get guest by user ID
+ *     tags: [Guests]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Guest found
+ *       404:
+ *         description: Guest not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/user/:userId", auth_1.authenticate, guests_controller_1.getGuestByUserId);
+/**
+ * @swagger
  * /guests:
  *   post:
  *     summary: Create a new guest

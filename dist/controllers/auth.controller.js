@@ -10,26 +10,35 @@ const db_1 = __importDefault(require("../config/db"));
 const AppError_1 = require("../utils/AppError");
 const SALT_ROUNDS = 10;
 const registerUser = async (req, res, next) => {
-    const { name, email, password, confirmPsd } = req.body;
-    if (password !== confirmPsd) {
-        throw new AppError_1.AppError("Password and confirm password do not matched! Try again.", 400);
-    }
-    const insert_sql = "INSERT INTO users(name,email,password)VALUES($1,$2,$3) RETURNING id,name,email,role,created_at;";
+    const { name, email, password } = req.body;
+    const client = await db_1.default.connect();
     try {
-        const existing_email = await db_1.default.query("SELECT * FROM users WHERE email = $1", [email]);
-        if (existing_email.rowCount && existing_email.rowCount > 0) {
+        await client.query("BEGIN");
+        const existing = await client.query("SELECT * FROM users WHERE email = $1", [email]);
+        if (existing.rowCount && existing.rowCount > 0) {
+            await client.query("ROLLBACK");
             throw new AppError_1.AppError("Email already registered!", 400);
         }
-        const hashed_Password = await bcrypt_1.default.hash(password, SALT_ROUNDS);
-        const result = await db_1.default.query(insert_sql, [name, email, hashed_Password]);
+        const hashedPassword = await bcrypt_1.default.hash(password, 10);
+        const userResult = await client.query(`INSERT INTO users (name, email, password)
+       VALUES ($1, $2, $3)
+       RETURNING id, name, email, role`, [name, email, hashedPassword]);
+        const newUser = userResult.rows[0];
+        await client.query(`INSERT INTO guests (name, email, phone, user_id)
+       VALUES ($1, $2, $3, $4)`, [name, email, "", newUser.id]);
+        await client.query("COMMIT");
         return res.status(201).json({
             success: true,
             message: "User registered successfully!",
-            data: result.rows[0]
+            data: newUser,
         });
     }
     catch (error) {
+        await client.query("ROLLBACK");
         next(error);
+    }
+    finally {
+        client.release();
     }
 };
 exports.registerUser = registerUser;

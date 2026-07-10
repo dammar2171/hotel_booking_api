@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteGuest = exports.updateGuest = exports.createGuest = exports.getGuestById = exports.getGuests = void 0;
+exports.deleteGuest = exports.updateGuest = exports.createGuest = exports.getGuestByUserId = exports.getGuestById = exports.getGuests = void 0;
 const db_1 = __importDefault(require("../config/db"));
 const pagination_1 = require("../utils/pagination");
 const AppError_1 = require("../utils/AppError");
@@ -41,6 +41,24 @@ const getGuestById = async (req, res, next) => {
     }
 };
 exports.getGuestById = getGuestById;
+const getGuestByUserId = async (req, res, next) => {
+    const userId = Number(req.params.userId);
+    try {
+        const result = await db_1.default.query("SELECT * FROM guests WHERE user_id = $1", [userId]);
+        if (result.rowCount === 0) {
+            throw new AppError_1.AppError("Guest profile not found!", 404);
+        }
+        return res.status(200).json({
+            success: true,
+            message: "Guest found!",
+            data: result.rows[0],
+        });
+    }
+    catch (error) {
+        next(error);
+    }
+};
+exports.getGuestByUserId = getGuestByUserId;
 const createGuest = async (req, res, next) => {
     const { name, email, phone } = req.body;
     const sql = "INSERT INTO guests(name,email,phone) VALUES($1,$2,$3) RETURNING *;";

@@ -58,7 +58,7 @@ router.get("/:id",authenticate, getGuestById);
 
 /**
  * @swagger
- * /user/{userId}:
+ * /guests/user/{userId}:
  *   get:
  *     summary: Get guest by user ID
  *     tags: [Guests]
