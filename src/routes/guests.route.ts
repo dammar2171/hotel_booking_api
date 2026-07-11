@@ -2,7 +2,7 @@ import { Router } from "express";
 import { getGuests, getGuestById, createGuest, deleteGuest ,updateGuest, getGuestByUserId} from "../controllers/guests.controller";
 import { validate } from "../middleware/validate";
 import { createGuestSchema ,updateGuestSchema} from "../schemas/guests.schema";
-import { authenticate } from "../middleware/auth";
+import { authenticate, authorizeAdmin } from "../middleware/auth";
 
 const router = Router();
 
@@ -32,7 +32,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.get("/",authenticate, getGuests);
+router.get("/",authenticate,authorizeAdmin, getGuests);
 
 /**
  * @swagger
@@ -54,7 +54,7 @@ router.get("/",authenticate, getGuests);
  *       500:
  *         description: Internal server error
  */
-router.get("/:id",authenticate, getGuestById);
+router.get("/:id",authenticate, authorizeAdmin, getGuestById);
 
 /**
  * @swagger
@@ -76,7 +76,7 @@ router.get("/:id",authenticate, getGuestById);
  *       500:
  *         description: Internal server error
  */
-router.get("/user/:userId", authenticate, getGuestByUserId);
+router.get("/user/:userId", authenticate, authorizeAdmin,getGuestByUserId);
 
 /**
  * @swagger
@@ -146,6 +146,6 @@ router.put("/:id",authenticate, validate(updateGuestSchema),updateGuest);
  *       500:
  *         description: Internal Server Error
  */
-router.delete("/:id",authenticate, deleteGuest);
+router.delete("/:id",authenticate,authorizeAdmin, deleteGuest);
 
 export default router;

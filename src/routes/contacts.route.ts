@@ -1,10 +1,38 @@
 import { Router } from "express";
 import { authenticate, authorizeAdmin } from "../middleware/auth";
-import { createContact, deleteContact } from "../controllers/contacts.controller";
+import { createContact, deleteContact, getContacts } from "../controllers/contacts.controller";
 import { validate } from "../middleware/validate";
 import { createContactSchema } from "../schemas/contacts.schema";
 
 const router = Router();
+
+/**
+ * @swagger
+ * /contacts:
+ *   get:
+ *     summary: Get all contacs
+ *     description: Returns a paginated list of contacts.
+ *     tags: [Contacts]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *     responses:
+ *       201:
+ *         description: Message founds!
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/", authenticate,authorizeAdmin,getContacts);
 
 /**
  * @swagger

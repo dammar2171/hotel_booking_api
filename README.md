@@ -237,6 +237,7 @@ npm start
 | ------ | --------------- | ---------------- | ----- |
 | GET    | `/contacts`     | Get all contacts | admin |
 | DELETE | `/contacts/:id` | Delete contacts  | admin |
+| POST   | `/contacts/`    | Post contacts    | admin |
 
 ### Bookings
 

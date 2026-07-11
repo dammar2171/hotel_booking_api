@@ -32,7 +32,7 @@ const router = (0, express_1.Router)();
  *       500:
  *         description: Internal server error
  */
-router.get("/", auth_1.authenticate, guests_controller_1.getGuests);
+router.get("/", auth_1.authenticate, auth_1.authorizeAdmin, guests_controller_1.getGuests);
 /**
  * @swagger
  * /guests/{id}:
@@ -53,7 +53,7 @@ router.get("/", auth_1.authenticate, guests_controller_1.getGuests);
  *       500:
  *         description: Internal server error
  */
-router.get("/:id", auth_1.authenticate, guests_controller_1.getGuestById);
+router.get("/:id", auth_1.authenticate, auth_1.authorizeAdmin, guests_controller_1.getGuestById);
 /**
  * @swagger
  * /guests/user/{userId}:
@@ -74,7 +74,7 @@ router.get("/:id", auth_1.authenticate, guests_controller_1.getGuestById);
  *       500:
  *         description: Internal server error
  */
-router.get("/user/:userId", auth_1.authenticate, guests_controller_1.getGuestByUserId);
+router.get("/user/:userId", auth_1.authenticate, auth_1.authorizeAdmin, guests_controller_1.getGuestByUserId);
 /**
  * @swagger
  * /guests:
@@ -141,5 +141,5 @@ router.put("/:id", auth_1.authenticate, (0, validate_1.validate)(guests_schema_1
  *       500:
  *         description: Internal Server Error
  */
-router.delete("/:id", auth_1.authenticate, guests_controller_1.deleteGuest);
+router.delete("/:id", auth_1.authenticate, auth_1.authorizeAdmin, guests_controller_1.deleteGuest);
 exports.default = router;
