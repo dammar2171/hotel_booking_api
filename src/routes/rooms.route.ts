@@ -36,7 +36,7 @@ const router = Router();
  *       200:
  *         description: Rooms fetched successfully
  */
-router.get("/",authenticate, getRooms);
+router.get("/", getRooms);
 
 /**
  * @swagger
@@ -50,7 +50,7 @@ router.get("/",authenticate, getRooms);
  *       404:
  *         description: No available rooms
  */
-router.get("/available",authenticate, getAvailableRooms);
+router.get("/available", getAvailableRooms);
 
 /**
  * @swagger
@@ -70,7 +70,7 @@ router.get("/available",authenticate, getAvailableRooms);
  *       404:
  *         description: Room not found
  */
-router.get("/:id",authenticate, getRoomById);
+router.get("/:id", getRoomById);
 
 /**
  * @swagger

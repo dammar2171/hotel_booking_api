@@ -52,7 +52,7 @@ router.get("/", authenticate,authorizeAdmin,getContacts);
  *       500:
  *         description: Internal server error
  */
-router.post('/', authenticate,authorizeAdmin,validate(createContactSchema) ,createContact);
+router.post('/', authenticate,validate(createContactSchema) ,createContact);
 
 /**
  * @swagger

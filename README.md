@@ -153,6 +153,10 @@ CREATE TABLE rooms (
   type         VARCHAR(50)    NOT NULL,
   price        DECIMAL(10,2)  NOT NULL,
   is_available BOOLEAN        NOT NULL DEFAULT true
+  description  TEXT           NOT NULL,
+  image_url    VARCHAR(500)   NOT NULL,
+  rating       DECIMAL(2,1),
+  amenties     TEXT[]
 );
 
 CREATE TABLE guests (
@@ -160,7 +164,7 @@ CREATE TABLE guests (
   name  VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
   phone VARCHAR(20)  NOT NULL
-  user_id     INTEGER      NOT NULL REFERENCES users(id),
+  user_id INTEGER  NOT NULL REFERENCES users(id),
 );
 
 CREATE TABLE bookings (
@@ -170,7 +174,10 @@ CREATE TABLE bookings (
   check_in    DATE         NOT NULL,
   check_out   DATE         NOT NULL,
   total_price DECIMAL(10,2),
-  status      VARCHAR(20)  NOT NULL DEFAULT 'confirmed'
+  status      VARCHAR(20)  NOT NULL DEFAULT 'confirmed',
+  guests INTEGER ,
+  payment_method VARCHAR(50),
+  special_request TEXT,
 );
 
 CREATE TABLE contacts (
@@ -329,4 +336,4 @@ Interactive Swagger documentation available at:
 
 ## 📄 License
 
-MIT
+BCA

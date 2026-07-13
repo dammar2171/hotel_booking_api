@@ -32,7 +32,7 @@ const router = (0, express_1.Router)();
  *       200:
  *         description: Rooms fetched successfully
  */
-router.get("/", auth_1.authenticate, rooms_controller_1.getRooms);
+router.get("/", rooms_controller_1.getRooms);
 /**
  * @swagger
  * /rooms/available:
@@ -45,7 +45,7 @@ router.get("/", auth_1.authenticate, rooms_controller_1.getRooms);
  *       404:
  *         description: No available rooms
  */
-router.get("/available", auth_1.authenticate, rooms_controller_1.getAvailableRooms);
+router.get("/available", rooms_controller_1.getAvailableRooms);
 /**
  * @swagger
  * /rooms/{id}:
@@ -64,7 +64,7 @@ router.get("/available", auth_1.authenticate, rooms_controller_1.getAvailableRoo
  *       404:
  *         description: Room not found
  */
-router.get("/:id", auth_1.authenticate, rooms_controller_1.getRoomById);
+router.get("/:id", rooms_controller_1.getRoomById);
 /**
  * @swagger
  * /rooms:

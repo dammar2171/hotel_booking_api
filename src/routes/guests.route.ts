@@ -54,7 +54,7 @@ router.get("/",authenticate,authorizeAdmin, getGuests);
  *       500:
  *         description: Internal server error
  */
-router.get("/:id",authenticate, authorizeAdmin, getGuestById);
+router.get("/:id",authenticate, getGuestById);
 
 /**
  * @swagger
@@ -76,7 +76,7 @@ router.get("/:id",authenticate, authorizeAdmin, getGuestById);
  *       500:
  *         description: Internal server error
  */
-router.get("/user/:userId", authenticate, authorizeAdmin,getGuestByUserId);
+router.get("/user/:userId", authenticate,getGuestByUserId);
 
 /**
  * @swagger
