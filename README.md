@@ -152,7 +152,7 @@ CREATE TABLE rooms (
   room_number  VARCHAR(10)    NOT NULL UNIQUE,
   type         VARCHAR(50)    NOT NULL,
   price        DECIMAL(10,2)  NOT NULL,
-  is_available BOOLEAN        NOT NULL DEFAULT true
+  is_available BOOLEAN        NOT NULL DEFAULT true,
   description  TEXT           NOT NULL,
   image_url    VARCHAR(500)   NOT NULL,
   rating       DECIMAL(2,1),
@@ -163,8 +163,8 @@ CREATE TABLE guests (
   id    SERIAL PRIMARY KEY,
   name  VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
-  phone VARCHAR(20)  NOT NULL
-  user_id INTEGER  NOT NULL REFERENCES users(id),
+  phone VARCHAR(20)  NOT NULL,
+  user_id INTEGER  NOT NULL REFERENCES users(id)
 );
 
 CREATE TABLE bookings (
@@ -177,7 +177,7 @@ CREATE TABLE bookings (
   status      VARCHAR(20)  NOT NULL DEFAULT 'confirmed',
   guests INTEGER ,
   payment_method VARCHAR(50),
-  special_request TEXT,
+  special_request TEXT
 );
 
 CREATE TABLE contacts (
