@@ -45,7 +45,7 @@ app.get("/health", (req, res) => {
         message: "Server is healthy",
         data: {
             uptime: process.uptime(),
-            timestamp: new Date().toISOString
+            timestamp: new Date().toISOString()
         }
     });
 });
@@ -59,5 +59,5 @@ app.use("/stats", stats_route_1.default);
 app.use(errorHandler_1.errorHandler);
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-    console.log(`Open http://localhost:${port} in your browser`);
+    // console.log(`Open http://localhost:${port} in your browser`)
 });
