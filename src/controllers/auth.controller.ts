@@ -9,9 +9,10 @@ const SALT_ROUNDS = 10;
 
 export const registerUser = async (req:Request<{},{},RegisterBody>, res:Response<ApiResponse<User>>, next:NextFunction) => {
   const { name, email, password } = req.body;
-  const client = await pool.connect();
+  let client;
 
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
 
     const existing = await client.query(
@@ -47,10 +48,10 @@ export const registerUser = async (req:Request<{},{},RegisterBody>, res:Response
     });
 
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK");
     next(error);
   } finally {
-    client.release();
+    if (client) client.release();
   }
 };
 

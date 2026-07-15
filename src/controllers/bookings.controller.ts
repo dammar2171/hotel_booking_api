@@ -42,8 +42,9 @@ export const createBooking = async(req:Request<{},{},CreateBookingBody>,res:Resp
   const sql = "INSERT INTO bookings (guest_id,room_id,check_in,check_out,total_price,status,guests,payment_method,special_request)VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *;";
   const check_room_sql = "SELECT * FROM rooms WHERE id=$1;";
   const update_room_sql = "UPDATE rooms SET is_available= $1 WHERE id =$2;";
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
     const room_detail = await client.query<Rooms>(check_room_sql,[room_id]);
     if(room_detail.rowCount === 0){
@@ -72,10 +73,10 @@ export const createBooking = async(req:Request<{},{},CreateBookingBody>,res:Resp
       await client.query("COMMIT");
       return res.status(201).json({success:true,message:"Room booked successfully!",data:result.rows[0]});
   } catch (error) {
-    await client.query('ROLLBACK');
+    if (client) await client.query('ROLLBACK');
     next(error);
   }finally{
-    client.release();
+    if (client) client.release();
   }
 }
 
@@ -84,8 +85,9 @@ export const cancelBooking = async (req:Request<{id:string}>,res:Response<ApiRes
   const booking_detail_sql = "SELECT * FROM bookings WHERE id=$1;";
   const sql = "UPDATE bookings SET status = $1 WHERE id=$2 RETURNING *;";
   const update_room_available_sql = "UPDATE rooms SET is_available =$1 WHERE id=$2 ;";
-  const client = await pool.connect();
+  let client;
   try {
+    client = await pool.connect();
     await client.query("BEGIN");
     const booking_detail = await client.query(booking_detail_sql,[id]);
     if(booking_detail.rowCount === 0 ){
@@ -104,10 +106,10 @@ export const cancelBooking = async (req:Request<{id:string}>,res:Response<ApiRes
     await client.query("COMMIT");
     return res.status(200).json({success:true,message:"Booking cancelled!",data:result.rows[0]})
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (client) await client.query("ROLLBACK");
     next(error);
   }finally{
-    client.release()
+    if (client) client.release()
   }
 }
 
