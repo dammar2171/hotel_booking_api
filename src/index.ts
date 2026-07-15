@@ -18,7 +18,7 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger";
 
 const app = express();
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 const port = process.env.PORT || 3000;
 
 app.use(helmet());
