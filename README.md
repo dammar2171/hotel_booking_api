@@ -4,8 +4,8 @@ A production-style REST API for managing hotel room bookings, built with **Node.
 
 ## 🚀 Live Demo
 
-> API Base URL: `http://localhost:5000`
-> API Docs: `http://localhost:5000/api-docs`
+> API Base URL: `https://hotelbookingapi-production-81c6.up.railway.app`
+> API Docs: `https://hotelbookingapi-production-81c6.up.railway.app/api-docs`
 
 ---
 
@@ -110,7 +110,7 @@ hotel-booking-api/
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/hotel-booking-api.git
+git clone https://github.com/dammar2171/hotel_booking_api
 cd hotel-booking-api
 
 # Install dependencies
@@ -156,7 +156,7 @@ CREATE TABLE rooms (
   description  TEXT           NOT NULL,
   image_url    VARCHAR(500)   NOT NULL,
   rating       DECIMAL(2,1),
-  amenties     TEXT[]
+  amenities     TEXT[]
 );
 
 CREATE TABLE guests (
